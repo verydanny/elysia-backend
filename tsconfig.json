@@ -1,0 +1,10 @@
+{
+  "extends": "./config/typescript/tsconfig.bun.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": ".",
+    "outDir": "dist",
+    "composite": true,
+  },
+  "include": ["src", "lucia.ts", "Lucia.d.ts"]
+}

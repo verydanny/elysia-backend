@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    ports:
+      - ${PGPORT}:${PGPORT}
+    environment:
+      - POSTGRES_USER=${PGUSERNAME}
+      - POSTGRES_PASSWORD=${PGPASSWORD}
+    volumes: 
+      - ./dbdata:/var/lib/postgresql/data
+
+volumes:
+  dbdata:

@@ -1,0 +1,33 @@
+{
+  "name": "timbus-backend",
+  "version": "1.0.50",
+  "scripts": {
+    "test": "bun test",
+    "dev": "bun run --watch src/index.tsx",
+    "prod": "NODE_ENV=production bun src/index.ts",
+    "migrate": "ley"
+  },
+  "dependencies": {
+    "@elysiajs/cors": "^0.7.2",
+    "@elysiajs/html": "latest",
+    "elysia": "latest",
+    "postgres": "latest",
+    "lucia": "^2.7.5",
+    "@lucia-auth/adapter-postgresql": "^2.0.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "eslint-plugin-prettier": "^5.1.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.1.1",
+    "ley": "latest",
+    "bun-types": "latest",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.3"
+  },
+  "module": "src/index.js",
+  "type": "module"
+}
