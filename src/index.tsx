@@ -7,7 +7,7 @@ const app = new Elysia()
   .use(cors())
   .use(html())
   .get('/', () => {
-    return `<h1>Home Page</h1>`
+    return `<h1>Hello, World</h1>`
   })
   .use(user)
   .listen(Bun.env.PORT || 3000)

@@ -4,14 +4,17 @@
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
+    
     // Module
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "lib": ["ESNext"],
+    "target": "esnext",
+    "module": "nodenext",
+    "moduleDetection": "force",
     "isolatedModules": true,
-    "target": "ESNext",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": false,
     "importHelpers": true,
+
     // Typing
     "strict": true,
     "noEmitOnError": false,
@@ -20,6 +23,7 @@
     "jsxFactory": "Html.createElement",
     "jsxFragmentFactory": "Html.Fragment",
     "plugins": [{ "name": "@kitajs/ts-html-plugin" }],
+
     // Performance
     "incremental": true
   }
