@@ -38,6 +38,7 @@ jobs:
         with:
           caprover-auth-token: ${{ steps.caprover-login.outputs.caprover-auth-token }}
           caprover-url: ${{ secrets.CAPROVER_URL }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       # Build Docker image on Github
       # Deploy Docker image to repository
