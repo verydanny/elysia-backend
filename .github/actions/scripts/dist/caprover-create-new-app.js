@@ -22433,7 +22433,8 @@ async function run() {
       repo: github.context.repo.repo,
       ref: github.context.ref,
       environment: "preview",
-      auto_merge: false
+      auto_merge: false,
+      required_contexts: []
     });
   } catch (error2) {
     core3.error(`${error2}`);

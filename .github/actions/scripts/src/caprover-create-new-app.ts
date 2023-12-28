@@ -57,6 +57,7 @@ export async function run() {
       ref: github.context.ref,
       environment: 'preview',
       auto_merge: false,
+      required_contexts: [],
     })
   } catch (error) {
     core.error(`${error}`)
