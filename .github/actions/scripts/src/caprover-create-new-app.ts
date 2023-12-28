@@ -50,15 +50,33 @@ export async function run() {
     }
 
     const octokit = github.getOctokit(getInputGithubToken)
-
-    await octokit.rest.repos.createDeployment({
+    const parameters = {
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
-      ref: github.context.ref,
-      environment: 'preview',
-      auto_merge: false,
-      required_contexts: [],
-    })
+    }
+
+    // const getCreateDeployment = await octokit.rest.repos.createDeployment({
+    //   owner: github.context.repo.owner,
+    //   repo: github.context.repo.repo,
+    //   ref: github.context.ref,
+    //   environment: 'preview',
+    //   auto_merge: false,
+    //   required_contexts: [],
+    //   transient_environment: true
+    // })
+
+    const getDeployments = await octokit.rest.repos.listDeployments(parameters)
+
+    if (getDeployments.status === 200) {
+      const deleteDeployments = getDeployments.data.map(({ id }) =>
+        octokit.rest.repos.deleteDeployment({
+          ...parameters,
+          deployment_id: id,
+        })
+      )
+
+      await Promise.all(deleteDeployments)
+    }
   } catch (error) {
     core.error(`${error}`)
   }
