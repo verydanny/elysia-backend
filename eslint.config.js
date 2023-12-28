@@ -28,6 +28,6 @@ export default [
   },
   eslintConfigPrettier,
   {
-    ignores: ['**/node_modules'],
+    ignores: ['**/node_modules', '**/.github/actions/scripts/dist'],
   },
 ]

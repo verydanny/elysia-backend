@@ -1,11 +1,10 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+import { getDeleteDeployments } from './githubHelpers.js'
 import {
   INPUT_APP_NAME,
-  INPUT_GITHUB_TOKEN,
   OUTPUT_APP_NAME,
   getInputAppName,
-  getInputGithubToken,
 } from './constants.js'
 import { getPostCaproverCreateApp } from './fetch.js'
 
@@ -41,20 +40,7 @@ export async function run() {
       core.setOutput(OUTPUT_APP_NAME, getCaproverRegisteredName)
     }
 
-    if (!getInputGithubToken) {
-      core.notice(
-        `Caprover: missing '${INPUT_GITHUB_TOKEN}', can't post deployment link`
-      )
-
-      return
-    }
-
-    const octokit = github.getOctokit(getInputGithubToken)
-    const parameters = {
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-    }
-
+    await getDeleteDeployments()
     // const getCreateDeployment = await octokit.rest.repos.createDeployment({
     //   owner: github.context.repo.owner,
     //   repo: github.context.repo.repo,
@@ -64,19 +50,6 @@ export async function run() {
     //   required_contexts: [],
     //   transient_environment: true
     // })
-
-    const getDeployments = await octokit.rest.repos.listDeployments(parameters)
-
-    if (getDeployments.status === 200) {
-      const deleteDeployments = getDeployments.data.map(({ id }) =>
-        octokit.rest.repos.deleteDeployment({
-          ...parameters,
-          deployment_id: id,
-        })
-      )
-
-      await Promise.all(deleteDeployments)
-    }
   } catch (error) {
     core.error(`${error}`)
   }

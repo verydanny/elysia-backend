@@ -36,7 +36,7 @@ interface CaproverFetch {
   body?: CaproverBodyJSON
 }
 
-function createHeaders(): Headers {
+function createHeaders() {
   const headers = new Headers()
 
   headers.append('Content-Type', 'application/json')

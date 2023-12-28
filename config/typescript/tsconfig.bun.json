@@ -8,12 +8,12 @@
     // Module
     "lib": ["ESNext"],
     "target": "esnext",
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "moduleDetection": "force",
     "isolatedModules": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": false,
+    "allowSyntheticDefaultImports": true,
     "importHelpers": true,
 
     // Typing
@@ -24,6 +24,9 @@
     "jsxFactory": "Html.createElement",
     "jsxFragmentFactory": "Html.Fragment",
     "plugins": [{ "name": "@kitajs/ts-html-plugin" }],
+    "types": [
+      "bun-types"
+    ],
 
     // Performance
     "incremental": true
