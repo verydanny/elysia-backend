@@ -9,6 +9,7 @@
     "lib": ["ESNext"],
     "target": "esnext",
     "module": "nodenext",
+    "moduleResolution": "nodenext",
     "moduleDetection": "force",
     "isolatedModules": true,
     "esModuleInterop": true,

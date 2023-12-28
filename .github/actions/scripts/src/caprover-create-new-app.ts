@@ -2,8 +2,10 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import {
   INPUT_APP_NAME,
+  INPUT_GITHUB_TOKEN,
   OUTPUT_APP_NAME,
   getInputAppName,
+  getInputGithubToken,
 } from './constants.js'
 import { getPostCaproverCreateApp } from './fetch.js'
 
@@ -38,6 +40,24 @@ export async function run() {
     if (getCaproverRegisteredName) {
       core.setOutput(OUTPUT_APP_NAME, getCaproverRegisteredName)
     }
+
+    if (!getInputGithubToken) {
+      core.notice(
+        `Caprover: missing '${INPUT_GITHUB_TOKEN}', can't post deployment link`
+      )
+
+      return
+    }
+
+    const octokit = github.getOctokit(getInputGithubToken)
+
+    await octokit.rest.repos.createDeployment({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.owner,
+      ref: github.context.ref,
+      environment: 'preview',
+      auto_merge: false,
+    })
   } catch (error) {
     core.error(`${error}`)
   }

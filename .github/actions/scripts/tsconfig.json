@@ -4,8 +4,6 @@
     "rootDir": ".",
     "baseUrl": ".",
     "outDir": "actions/scripts/dist",
-    "composite": true,
-    "noEmit": false,
     "emitDeclarationOnly": false
   },
   "include": [

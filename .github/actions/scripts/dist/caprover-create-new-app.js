@@ -21730,11 +21730,13 @@ var INPUT_PASSWORD = "caprover-password";
 var INPUT_OTP_TOKEN = "caprover-otp";
 var INPUT_AUTH_TOKEN = "caprover-auth-token";
 var INPUT_APP_NAME = "caprover-app-name";
+var INPUT_GITHUB_TOKEN = "github-token";
 var getInputUrl = core.getInput(INPUT_URL);
 var getInputPassword = core.getInput(INPUT_PASSWORD);
 var getInputOtpToken = Number(core.getInput(INPUT_OTP_TOKEN));
 var getInputAuthToken = core.getInput(INPUT_AUTH_TOKEN);
 var getInputAppName = core.getInput(INPUT_APP_NAME);
+var getInputGithubToken = core.getInput(INPUT_GITHUB_TOKEN);
 var OUTPUT_AUTH_TOKEN = "caprover-auth-token";
 var OUTPUT_APP_NAME = "caprover-app-name";
 var STATUS;
@@ -22421,6 +22423,18 @@ async function run() {
     if (getCaproverRegisteredName) {
       core3.setOutput(OUTPUT_APP_NAME, getCaproverRegisteredName);
     }
+    if (!getInputGithubToken) {
+      core3.notice(`Caprover: missing '${INPUT_GITHUB_TOKEN}', can't post deployment link`);
+      return;
+    }
+    const octokit = github.getOctokit(getInputGithubToken);
+    await octokit.rest.repos.createDeployment({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.owner,
+      ref: github.context.ref,
+      environment: "preview",
+      auto_merge: false
+    });
   } catch (error2) {
     core3.error(`${error2}`);
   }

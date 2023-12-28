@@ -12,6 +12,9 @@ inputs:
       The new Caprover app to be registered, otherwise generates one
       from github.ref and github.sha
     required: false
+  github-token:
+    description: Github secret for the Workflow
+    required: true
 outputs:
   caprover-app-name:
     description: The app name that Caprover created
