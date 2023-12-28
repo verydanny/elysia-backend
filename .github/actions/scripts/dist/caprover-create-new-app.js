@@ -22430,7 +22430,7 @@ async function run() {
     const octokit = github.getOctokit(getInputGithubToken);
     await octokit.rest.repos.createDeployment({
       owner: github.context.repo.owner,
-      repo: github.context.repo.owner,
+      repo: github.context.repo.repo,
       ref: github.context.ref,
       environment: "preview",
       auto_merge: false
