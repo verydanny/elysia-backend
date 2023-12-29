@@ -258,13 +258,19 @@ export async function caproverDeploy({
     })
 
     if (startDeploy === STATUS.OKAY_BUILD_STARTED) {
+      // caproverFetch({
+      //   method: 'POST',
+      //   endpoint: '/user/apps/appDefinitions/enablebasedomainssl',
+      //   body: {
+      //     appName,
+      //   },
+      // })
       return await caproverFetch({
         method: 'POST',
         endpoint: '/user/apps/appDefinitions/update',
         body: {
           appName,
           instanceCount: 1,
-          forceSsl: true,
         },
       })
     }

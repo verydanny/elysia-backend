@@ -22448,8 +22448,7 @@ async function caproverDeploy({
         endpoint: "/user/apps/appDefinitions/update",
         body: {
           appName,
-          instanceCount: 1,
-          forceSsl: true
+          instanceCount: 1
         }
       });
     }
