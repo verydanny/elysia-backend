@@ -61,9 +61,9 @@ jobs:
         id: caprover-login
         uses: ./.github/actions/caprover-login
         with:
+          caprover-url: ${{ secrets.CAPROVER_URL }}
           caprover-password: ${{ secrets.CAPROVER_PASSWORD }}
           caprover-otp: ${{ steps.otp.outputs.otp-token }}
-          caprover-url: ${{ secrets.CAPROVER_URL }}
 
       - 
         name: Create new Caprover App and Post URL

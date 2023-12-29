@@ -22446,10 +22446,12 @@ async function getEnableAndReturnAppToken({
 }
 async function caproverFetch(config) {
   const url = getInputUrl;
+  core3.info(`DEBUG: ${url}`);
   if (!url) {
     core3.setFailed(`Caprover: '${INPUT_URL}' input needed`);
     return;
   }
+  core3.info(`DEBUG: ${getInputPassword} ${getInputAuthToken} ${config.endpoint}`);
   if (!getInputPassword && config.endpoint === "/login" || !getInputAuthToken && config.endpoint !== "/login") {
     core3.setFailed(`Caprover: you must provide a '${INPUT_AUTH_TOKEN}' or '${INPUT_PASSWORD}'`);
     return;
