@@ -18617,6 +18617,7 @@ async function caproverFetch(config) {
 
 // /Users/verydanny/source/elysia-backend/.github/actions/scripts/src/caprover-login.ts
 async function run() {
+  core3.info(`OTP TOKEN: ${getInputOtpToken}`);
   try {
     const token = await getPostCaproverLogin();
     if (token) {
@@ -18624,9 +18625,11 @@ async function run() {
       core3.setSecret(token);
       return core3.setOutput(OUTPUT_AUTH_TOKEN, token);
     }
+    core3.error(`Caprover: couldn't generator token...`);
   } catch (error3) {
     return core3.error(`Caprover: Something went wrong...`);
   }
+  return;
 }
 run();
 export {
