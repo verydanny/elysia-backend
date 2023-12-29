@@ -17897,14 +17897,17 @@ var INPUT_OTP_TOKEN = "caprover-otp";
 var INPUT_AUTH_TOKEN = "caprover-auth-token";
 var INPUT_APP_NAME = "caprover-app-name";
 var INPUT_GITHUB_TOKEN = "github-token";
+var INPUT_APP_TOKEN = "caprover-app-token";
 var getInputUrl = core.getInput(INPUT_URL);
 var getInputPassword = core.getInput(INPUT_PASSWORD);
 var getInputOtpToken = Number(core.getInput(INPUT_OTP_TOKEN));
 var getInputAuthToken = core.getInput(INPUT_AUTH_TOKEN);
 var getInputAppName = core.getInput(INPUT_APP_NAME);
+var getInputAppToken = core.getInput(INPUT_APP_TOKEN);
 var getInputGithubToken = core.getInput(INPUT_GITHUB_TOKEN);
 var OUTPUT_AUTH_TOKEN = "caprover-auth-token";
 var OUTPUT_APP_NAME = "caprover-app-name";
+var OUTPUT_APP_TOKEN = "caprover-app-token";
 var STATUS;
 (function(STATUS2) {
   STATUS2[STATUS2["OKAY"] = 100] = "OKAY";
@@ -18484,8 +18487,8 @@ async function getPostCaproverLogin() {
     if (loginResult && typeof loginResult === "object") {
       return loginResult.token;
     }
-  } catch (error) {
-    if (error.captainError === 1114) {
+  } catch (error2) {
+    if (error2.captainError === 1114) {
       core2.setFailed(`Caprover: you must provide an OTP Token, passed in as '${INPUT_OTP_TOKEN}'`);
       return;
     }
@@ -18502,11 +18505,14 @@ async function getPostCaproverCreateApp({
   hasPersistentData = false
 }) {
   try {
-    const apps = await getAllApps();
-    if (typeof apps === "object") {
-      const appExists = apps?.appDefinitions.some((app) => app.appName === appName);
+    const allApps = await getAllApps();
+    if (typeof allApps === "object") {
+      const appExists = allApps?.appDefinitions.find((app) => app.appName === appName);
       if (appExists) {
         core2.info(`Caprover: '${appName}' app name exists...deploying new version`);
+        if (appExists && appExists?.appDeployTokenConfig.enabled) {
+          return appName;
+        }
         return appName;
       }
     }
@@ -18522,12 +18528,53 @@ async function getPostCaproverCreateApp({
       core2.info(`Caprover: successfully registered name: '${appName}'`);
       return appName;
     }
-  } catch (error) {
-    if (STATUS[error.captainError]) {
-      core2.setFailed(`Caprover: failed with error code: ${error.captainError}`);
+  } catch (error2) {
+    if (STATUS[error2.captainError]) {
+      core2.setFailed(`Caprover: failed with error code: ${error2.captainError}`);
     }
   }
   return;
+}
+async function getEnableAndReturnAppToken({
+  appName
+}) {
+  try {
+    const prefetchAllApps = await getAllApps();
+    if (typeof prefetchAllApps === "object") {
+      const appToken = prefetchAllApps?.appDefinitions.find((apps) => apps.appName === appName);
+      if (appToken?.appDeployTokenConfig?.enabled) {
+        core2.info(`Caprover: app token already enabled for '${appName}'`);
+        return appToken?.appDeployTokenConfig?.appDeployToken;
+      }
+    }
+    const updateToEnableAppToken = await caproverFetch({
+      method: "POST",
+      endpoint: "/user/apps/appDefinitions/update",
+      body: {
+        appName,
+        appDeployTokenConfig: {
+          enabled: true
+        }
+      }
+    });
+    if (updateToEnableAppToken === STATUS.OKAY) {
+      core2.info(`Caprover: enabled appToken for '${appName}' \n
+        Fetching the newly created appToken...`);
+      const allApps = await getAllApps();
+      if (typeof allApps === "object") {
+        const appToken = allApps?.appDefinitions.find((apps) => apps.appName === appName);
+        if (appToken?.appDeployTokenConfig?.enabled) {
+          return appToken?.appDeployTokenConfig?.appDeployToken;
+        }
+      }
+    }
+    core2.error(`Caprover: unable to create app token for '${appName}'`);
+    return;
+  } catch (error2) {
+    if (STATUS[error2.captainError]) {
+      core2.setFailed(`Caprover: failed with error code: ${error2.captainError}`);
+    }
+  }
 }
 async function caproverFetch(config) {
   const url = getInputUrl;
@@ -18540,7 +18587,7 @@ async function caproverFetch(config) {
     return;
   }
   try {
-    const fetchAttempt = await fetch(url + BASE_API_PATH + config.endpoint, {
+    const fetchAttempt = await fetch(new URL(url, BASE_API_PATH + config.endpoint), {
       method: config?.method,
       body: JSON.stringify(config?.body),
       headers: createHeaders()
@@ -18560,7 +18607,7 @@ async function caproverFetch(config) {
       return data;
     }
     return;
-  } catch (error) {
+  } catch (error2) {
     core2.setFailed(`Caprover: Failed for an unknown reason`);
     return;
   }
@@ -18575,7 +18622,7 @@ async function run() {
       core3.setSecret(token);
       return core3.setOutput(OUTPUT_AUTH_TOKEN, token);
     }
-  } catch (error2) {
+  } catch (error3) {
     return core3.error(`Caprover: Something went wrong...`);
   }
 }

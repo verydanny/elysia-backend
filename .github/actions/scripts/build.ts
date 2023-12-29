@@ -11,6 +11,7 @@ const nodeBuild = await Bun.build({
   entrypoints: [
     resolve(__dirname, './src/caprover-login.ts'),
     resolve(__dirname, './src/caprover-create-new-app.ts'),
+    resolve(__dirname, './src/caprover-deploy-image.ts'),
   ],
   target: 'node',
   format: 'esm',

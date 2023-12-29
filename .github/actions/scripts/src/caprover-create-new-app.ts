@@ -46,7 +46,6 @@ export async function run() {
       const appToken = await getEnableAndReturnAppToken({ appName })
 
       if (appToken) {
-        core.setSecret(appToken)
         core.setOutput(OUTPUT_APP_TOKEN, appToken)
       }
     }

@@ -12,12 +12,14 @@ export const INPUT_OTP_TOKEN = 'caprover-otp'
 export const INPUT_AUTH_TOKEN = 'caprover-auth-token'
 export const INPUT_APP_NAME = 'caprover-app-name'
 export const INPUT_GITHUB_TOKEN = 'github-token'
+export const INPUT_APP_TOKEN = 'caprover-app-token'
 
 export const getInputUrl = core.getInput(INPUT_URL)
 export const getInputPassword = core.getInput(INPUT_PASSWORD)
 export const getInputOtpToken = Number(core.getInput(INPUT_OTP_TOKEN))
 export const getInputAuthToken = core.getInput(INPUT_AUTH_TOKEN)
 export const getInputAppName = core.getInput(INPUT_APP_NAME)
+export const getInputAppToken = core.getInput(INPUT_APP_TOKEN)
 export const getInputGithubToken = core.getInput(INPUT_GITHUB_TOKEN)
 
 export const OUTPUT_AUTH_TOKEN = 'caprover-auth-token'
