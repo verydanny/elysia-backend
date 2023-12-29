@@ -121,14 +121,10 @@ export async function getPostCaproverCreateApp({
         (app) => app.appName === appName
       )
 
-      if (appExists) {
+      if (appExists?.appName) {
         core.info(
           `Caprover: '${appName}' app name exists...deploying new version`
         )
-
-        if (appExists && appExists?.appDeployTokenConfig.enabled) {
-          return appName
-        }
 
         return appName
       }
@@ -165,6 +161,8 @@ export async function getEnableAndReturnAppToken({
   appName,
 }: Required<Pick<CaproverBodyJSON, 'appName'>>): Promise<string | undefined> {
   try {
+    core.info(`Caprover: prefetching to check for existing appToken`)
+
     const prefetchAllApps = await getAllApps()
 
     if (typeof prefetchAllApps === 'object') {
@@ -178,6 +176,8 @@ export async function getEnableAndReturnAppToken({
         return appToken?.appDeployTokenConfig?.appDeployToken
       }
     }
+
+    core.info(`Caprover: Enabling appToken for '${appName}'`)
 
     const updateToEnableAppToken = await caproverFetch({
       method: 'POST',

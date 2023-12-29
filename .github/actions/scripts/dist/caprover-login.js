@@ -18512,11 +18512,8 @@ async function getPostCaproverCreateApp({
     const allApps = await getAllApps();
     if (typeof allApps === "object") {
       const appExists = allApps?.appDefinitions.find((app) => app.appName === appName);
-      if (appExists) {
+      if (appExists?.appName) {
         core2.info(`Caprover: '${appName}' app name exists...deploying new version`);
-        if (appExists && appExists?.appDeployTokenConfig.enabled) {
-          return appName;
-        }
         return appName;
       }
     }
@@ -18543,6 +18540,7 @@ async function getEnableAndReturnAppToken({
   appName
 }) {
   try {
+    core2.info(`Caprover: prefetching to check for existing appToken`);
     const prefetchAllApps = await getAllApps();
     if (typeof prefetchAllApps === "object") {
       const appToken = prefetchAllApps?.appDefinitions.find((apps) => apps.appName === appName);
@@ -18551,6 +18549,7 @@ async function getEnableAndReturnAppToken({
         return appToken?.appDeployTokenConfig?.appDeployToken;
       }
     }
+    core2.info(`Caprover: Enabling appToken for '${appName}'`);
     const updateToEnableAppToken = await caproverFetch({
       method: "POST",
       endpoint: "/user/apps/appDefinitions/update",
