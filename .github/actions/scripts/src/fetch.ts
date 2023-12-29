@@ -241,15 +241,16 @@ export async function caproverFetch(config: CaproverFetch) {
     return
   }
 
+  const fetchEndpoint = new URL(url, BASE_API_PATH + config.endpoint)
+
+  core.info(`Logging in on: ${fetchEndpoint}`)
+
   try {
-    const fetchAttempt = await fetch(
-      new URL(url, BASE_API_PATH + config.endpoint),
-      {
-        method: config?.method,
-        body: JSON.stringify(config?.body),
-        headers: createHeaders(),
-      }
-    )
+    const fetchAttempt = await fetch(fetchEndpoint, {
+      method: config?.method,
+      body: JSON.stringify(config?.body),
+      headers: createHeaders(),
+    })
 
     const { status, data } = await (fetchAttempt.json() as Promise<{
       data: Record<string, string>

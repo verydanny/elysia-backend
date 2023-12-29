@@ -18586,8 +18586,10 @@ async function caproverFetch(config) {
     core2.setFailed(`Caprover: you must provide a '${INPUT_AUTH_TOKEN}' or '${INPUT_PASSWORD}'`);
     return;
   }
+  const fetchEndpoint = new URL(url, BASE_API_PATH + config.endpoint);
+  core2.info(`Logging in on: ${fetchEndpoint}`);
   try {
-    const fetchAttempt = await fetch(new URL(url, BASE_API_PATH + config.endpoint), {
+    const fetchAttempt = await fetch(fetchEndpoint, {
       method: config?.method,
       body: JSON.stringify(config?.body),
       headers: createHeaders()
