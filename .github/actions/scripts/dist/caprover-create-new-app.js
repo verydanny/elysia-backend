@@ -22329,7 +22329,6 @@ var zipWith = curry(zipWithFn);
 var $isEmpty = isEmpty;
 
 // /Users/verydanny/source/elysia-backend/.github/actions/scripts/src/fetch.ts
-import {URL as URL2} from "url";
 var createHeaders = function() {
   const headers = new Headers;
   headers.append("Content-Type", "application/json");
@@ -22460,11 +22459,8 @@ async function caproverFetch(config) {
     core3.setFailed(`Caprover: you must provide a '${INPUT_AUTH_TOKEN}' or '${INPUT_PASSWORD}'`);
     return;
   }
-  const fetchEndpoint = new URL2(url, `${BASE_API_PATH}${config.endpoint}`);
-  core3.info(`Logging in on: ${fetchEndpoint}`);
   try {
-    core3.info(`Starting fetchAttempt...${fetchEndpoint}`);
-    const fetchAttempt = await fetch(fetchEndpoint, {
+    const fetchAttempt = await fetch(`${url}${BASE_API_PATH}${config.endpoint}`, {
       method: config?.method,
       body: JSON.stringify(config?.body),
       headers: createHeaders()

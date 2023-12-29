@@ -17,7 +17,6 @@ import {
 } from './constants.js'
 import { GetPostCaproverLogin, type GetAllAppsJson } from './fetchTypes.js'
 import { isEmpty } from 'rambda'
-import { URL } from 'url'
 
 interface CaptainError extends Error {
   captainError: Exclude<STATUS, STATUS.OKAY | STATUS.OKAY_BUILD_STARTED>
@@ -252,18 +251,15 @@ export async function caproverFetch(config: CaproverFetch) {
     return
   }
 
-  const fetchEndpoint = new URL(url, `${BASE_API_PATH}${config.endpoint}`)
-
-  core.info(`Logging in on: ${fetchEndpoint}`)
-
   try {
-    core.info(`Starting fetchAttempt...${fetchEndpoint}`)
-
-    const fetchAttempt = await fetch(fetchEndpoint, {
-      method: config?.method,
-      body: JSON.stringify(config?.body),
-      headers: createHeaders(),
-    })
+    const fetchAttempt = await fetch(
+      `${url}${BASE_API_PATH}${config.endpoint}`,
+      {
+        method: config?.method,
+        body: JSON.stringify(config?.body),
+        headers: createHeaders(),
+      }
+    )
 
     const { status, data } = await (fetchAttempt.json() as Promise<{
       data: Record<string, string>
