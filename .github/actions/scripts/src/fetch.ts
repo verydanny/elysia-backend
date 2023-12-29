@@ -265,7 +265,7 @@ export async function caproverDeploy({
       //     appName,
       //   },
       // })
-      return await caproverFetch({
+      return caproverFetch({
         method: 'POST',
         endpoint: '/user/apps/appDefinitions/update',
         body: {
