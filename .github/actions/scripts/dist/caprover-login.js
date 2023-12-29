@@ -18563,8 +18563,7 @@ async function getEnableAndReturnAppToken({
         appName,
         appDeployTokenConfig: {
           enabled: true
-        },
-        instanceCount: 1
+        }
       }
     });
     if (updateToEnableAppToken === STATUS.OKAY) {
@@ -18603,7 +18602,8 @@ async function caproverDeploy({
           schemaVersion: 2,
           imageName
         }),
-        gitHash
+        gitHash,
+        instanceCount: 1
       }
     });
   } catch (error2) {

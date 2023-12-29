@@ -193,7 +193,6 @@ export async function getEnableAndReturnAppToken({
         appDeployTokenConfig: {
           enabled: true,
         },
-        instanceCount: 1,
       },
     })
 
@@ -254,6 +253,7 @@ export async function caproverDeploy({
           imageName,
         }),
         gitHash,
+        instanceCount: 1,
       },
     })
   } catch (error) {

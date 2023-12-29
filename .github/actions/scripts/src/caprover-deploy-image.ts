@@ -7,7 +7,9 @@ export async function run() {
   const gitHash = github.context.sha
 
   try {
-    await caproverDeploy({ gitHash })
+    const deployImage = await caproverDeploy({ gitHash })
+
+    core.info(`${deployImage}`)
   } catch (error) {
     if (error) {
       core.error(`${error}`)

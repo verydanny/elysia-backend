@@ -22430,8 +22430,7 @@ async function getEnableAndReturnAppToken({
         appName,
         appDeployTokenConfig: {
           enabled: true
-        },
-        instanceCount: 1
+        }
       }
     });
     if (updateToEnableAppToken === STATUS.OKAY) {
@@ -22470,7 +22469,8 @@ async function caproverDeploy({
           schemaVersion: 2,
           imageName
         }),
-        gitHash
+        gitHash,
+        instanceCount: 1
       }
     });
   } catch (error2) {
@@ -22522,7 +22522,8 @@ async function caproverFetch(config) {
 async function run() {
   const gitHash = github2.context.sha;
   try {
-    await caproverDeploy({ gitHash });
+    const deployImage = await caproverDeploy({ gitHash });
+    core4.info(`${deployImage}`);
   } catch (error3) {
     if (error3) {
       core4.error(`${error3}`);
