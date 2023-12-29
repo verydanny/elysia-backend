@@ -244,36 +244,42 @@ export async function caproverDeploy({
   }
 
   try {
-    const startDeploy = await caproverFetch({
+    const enableInstance = await caproverFetch({
       method: 'POST',
-      endpoint:
-        '/user/apps/appData/' + appName + (isDetached ? '?detached=1' : ''),
+      endpoint: '/user/apps/appDefinitions/update',
       body: {
-        captainDefinitionContent: JSON.stringify({
-          schemaVersion: 2,
-          imageName,
-        }),
-        gitHash,
+        appName,
+        instanceCount: 1,
       },
     })
 
-    if (startDeploy === STATUS.OKAY_BUILD_STARTED) {
-      // caproverFetch({
-      //   method: 'POST',
-      //   endpoint: '/user/apps/appDefinitions/enablebasedomainssl',
-      //   body: {
-      //     appName,
-      //   },
-      // })
-      return caproverFetch({
+    if (enableInstance === STATUS.OKAY) {
+      const startDeploy = await caproverFetch({
         method: 'POST',
-        endpoint: '/user/apps/appDefinitions/update',
+        endpoint:
+          '/user/apps/appData/' + appName + (isDetached ? '?detached=1' : ''),
         body: {
-          appName,
-          instanceCount: 1,
+          captainDefinitionContent: JSON.stringify({
+            schemaVersion: 2,
+            imageName,
+          }),
+          gitHash,
         },
       })
+
+      if (startDeploy === STATUS.OKAY_BUILD_STARTED) {
+        // caproverFetch({
+        //   method: 'POST',
+        //   endpoint: '/user/apps/appDefinitions/enablebasedomainssl',
+        //   body: {
+        //     appName,
+        //   },
+        // })
+        return startDeploy
+      }
     }
+
+    core.info(`${enableInstance}`)
   } catch (error) {
     if (STATUS[(error as CaptainError).captainError]) {
       core.error(`${error}`)
