@@ -252,6 +252,8 @@ export async function caproverFetch(config: CaproverFetch) {
     return
   }
 
+  core.info(`${URL}`)
+
   const fetchEndpoint = new URL(url, BASE_API_PATH + config.endpoint)
 
   core.info(`Logging in on: ${fetchEndpoint}`)

@@ -22460,6 +22460,7 @@ async function caproverFetch(config) {
     core3.setFailed(`Caprover: you must provide a '${INPUT_AUTH_TOKEN}' or '${INPUT_PASSWORD}'`);
     return;
   }
+  core3.info(`${URL2}`);
   const fetchEndpoint = new URL2(url, BASE_API_PATH + config.endpoint);
   core3.info(`Logging in on: ${fetchEndpoint}`);
   try {
