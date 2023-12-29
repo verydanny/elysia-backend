@@ -177,7 +177,7 @@ export async function getEnableAndReturnAppToken({
       }
     }
 
-    core.info(`Caprover: Enabling appToken for '${appName}'`)
+    core.info(`Caprover: enabling appToken for '${appName}'`)
 
     const updateToEnableAppToken = await caproverFetch({
       method: 'POST',
@@ -192,8 +192,7 @@ export async function getEnableAndReturnAppToken({
 
     if (updateToEnableAppToken === STATUS.OKAY) {
       core.info(
-        `Caprover: enabled appToken for '${appName}' \n
-        Fetching the newly created appToken...`
+        `Caprover: enabled appToken for '${appName}'\nFetching the newly created appToken...`
       )
 
       const allApps = await getAllApps()
@@ -209,7 +208,7 @@ export async function getEnableAndReturnAppToken({
       }
     }
 
-    core.error(`Caprover: unable to create app token for '${appName}'`)
+    core.setFailed(`Caprover: unable to create app token for '${appName}'`)
 
     return
   } catch (error) {
