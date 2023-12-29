@@ -21725,6 +21725,9 @@ var github = __toESM(require_github(), 1);
 
 // /Users/verydanny/source/elysia-backend/.github/actions/scripts/src/constants.ts
 var core = __toESM(require_core(), 1);
+var emptyStringToUndefined = function(str) {
+  return str === "" ? undefined : str;
+};
 var TOKEN_HEADER = "x-captain-auth";
 var NAMESPACE = "x-namespace";
 var CAPTAIN = "captain";
@@ -21736,13 +21739,13 @@ var INPUT_AUTH_TOKEN = "caprover-auth-token";
 var INPUT_APP_NAME = "caprover-app-name";
 var INPUT_GITHUB_TOKEN = "github-token";
 var INPUT_APP_TOKEN = "caprover-app-token";
-var getInputUrl = core.getInput(INPUT_URL);
-var getInputPassword = core.getInput(INPUT_PASSWORD);
-var getInputOtpToken = Number(core.getInput(INPUT_OTP_TOKEN));
-var getInputAuthToken = core.getInput(INPUT_AUTH_TOKEN);
-var getInputAppName = core.getInput(INPUT_APP_NAME);
-var getInputAppToken = core.getInput(INPUT_APP_TOKEN);
-var getInputGithubToken = core.getInput(INPUT_GITHUB_TOKEN);
+var getInputUrl = emptyStringToUndefined(core.getInput(INPUT_URL));
+var getInputPassword = emptyStringToUndefined(core.getInput(INPUT_PASSWORD));
+var getInputOtpToken = emptyStringToUndefined(core.getInput(INPUT_OTP_TOKEN));
+var getInputAuthToken = emptyStringToUndefined(core.getInput(INPUT_AUTH_TOKEN));
+var getInputAppName = emptyStringToUndefined(core.getInput(INPUT_APP_NAME));
+var getInputAppToken = emptyStringToUndefined(core.getInput(INPUT_APP_TOKEN));
+var getInputGithubToken = emptyStringToUndefined(core.getInput(INPUT_GITHUB_TOKEN));
 var OUTPUT_AUTH_TOKEN = "caprover-auth-token";
 var OUTPUT_APP_NAME = "caprover-app-name";
 var OUTPUT_APP_TOKEN = "caprover-app-token";
@@ -22348,7 +22351,7 @@ async function getPostCaproverLogin() {
       method: "POST",
       body: {
         password,
-        ...otpToken ? { otpToken } : {}
+        ...otpToken && !isNaN(otpToken) ? { otpToken } : {}
       }
     });
     core3.info(`Login result ${loginResult}`);

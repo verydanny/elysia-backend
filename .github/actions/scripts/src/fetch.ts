@@ -73,7 +73,7 @@ export async function getPostCaproverLogin(): Promise<string | undefined> {
       method: 'POST',
       body: {
         password,
-        ...(otpToken ? { otpToken } : {}),
+        ...(otpToken && !isNaN(otpToken) ? { otpToken } : {}),
       },
     })) as
       | GetPostCaproverLogin

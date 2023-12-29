@@ -1,5 +1,9 @@
 import * as core from '@actions/core'
 
+function emptyStringToUndefined(str: string) {
+  return str === '' ? undefined : str
+}
+
 export const TOKEN_HEADER = 'x-captain-auth'
 export const APP_TOKEN_HEADER = 'x-captain-app-token'
 export const NAMESPACE = 'x-namespace'
@@ -14,13 +18,25 @@ export const INPUT_APP_NAME = 'caprover-app-name'
 export const INPUT_GITHUB_TOKEN = 'github-token'
 export const INPUT_APP_TOKEN = 'caprover-app-token'
 
-export const getInputUrl = core.getInput(INPUT_URL)
-export const getInputPassword = core.getInput(INPUT_PASSWORD)
-export const getInputOtpToken = Number(core.getInput(INPUT_OTP_TOKEN))
-export const getInputAuthToken = core.getInput(INPUT_AUTH_TOKEN)
-export const getInputAppName = core.getInput(INPUT_APP_NAME)
-export const getInputAppToken = core.getInput(INPUT_APP_TOKEN)
-export const getInputGithubToken = core.getInput(INPUT_GITHUB_TOKEN)
+export const getInputUrl = emptyStringToUndefined(core.getInput(INPUT_URL))
+export const getInputPassword = emptyStringToUndefined(
+  core.getInput(INPUT_PASSWORD)
+)
+export const getInputOtpToken = emptyStringToUndefined(
+  core.getInput(INPUT_OTP_TOKEN)
+)
+export const getInputAuthToken = emptyStringToUndefined(
+  core.getInput(INPUT_AUTH_TOKEN)
+)
+export const getInputAppName = emptyStringToUndefined(
+  core.getInput(INPUT_APP_NAME)
+)
+export const getInputAppToken = emptyStringToUndefined(
+  core.getInput(INPUT_APP_TOKEN)
+)
+export const getInputGithubToken = emptyStringToUndefined(
+  core.getInput(INPUT_GITHUB_TOKEN)
+)
 
 export const OUTPUT_AUTH_TOKEN = 'caprover-auth-token'
 export const OUTPUT_APP_NAME = 'caprover-app-name'
