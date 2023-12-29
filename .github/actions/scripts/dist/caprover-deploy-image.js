@@ -22461,7 +22461,7 @@ async function caproverDeploy({
     core3.setFailed(`Caprover: you must provide a '${INPUT_IMAGE_URL}'`);
   }
   try {
-    return caproverFetch({
+    const startDeploy = await caproverFetch({
       method: "POST",
       endpoint: "/user/apps/appData/" + appName + (isDetached ? "?detached=1" : ""),
       body: {
@@ -22469,10 +22469,20 @@ async function caproverDeploy({
           schemaVersion: 2,
           imageName
         }),
-        gitHash,
-        instanceCount: 1
+        gitHash
       }
     });
+    if (startDeploy === STATUS.OKAY_BUILD_STARTED) {
+      return await caproverFetch({
+        method: "POST",
+        endpoint: "/user/apps/appDefinitions/update",
+        body: {
+          appName,
+          instanceCount: 1,
+          forceSsl: true
+        }
+      });
+    }
   } catch (error2) {
     if (STATUS[error2.captainError]) {
       core3.error(`${error2}`);

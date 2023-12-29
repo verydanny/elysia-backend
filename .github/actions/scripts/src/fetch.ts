@@ -37,6 +37,7 @@ interface CaproverBodyJSON {
   captainDefinitionContent?: string
   gitHash?: string
   instanceCount?: number
+  forceSsl?: boolean
 }
 
 interface CaproverFetch {
@@ -243,7 +244,7 @@ export async function caproverDeploy({
   }
 
   try {
-    return caproverFetch({
+    const startDeploy = await caproverFetch({
       method: 'POST',
       endpoint:
         '/user/apps/appData/' + appName + (isDetached ? '?detached=1' : ''),
@@ -253,9 +254,20 @@ export async function caproverDeploy({
           imageName,
         }),
         gitHash,
-        instanceCount: 1,
       },
     })
+
+    if (startDeploy === STATUS.OKAY_BUILD_STARTED) {
+      return await caproverFetch({
+        method: 'POST',
+        endpoint: '/user/apps/appDefinitions/update',
+        body: {
+          appName,
+          instanceCount: 1,
+          forceSsl: true,
+        },
+      })
+    }
   } catch (error) {
     if (STATUS[(error as CaptainError).captainError]) {
       core.error(`${error}`)
