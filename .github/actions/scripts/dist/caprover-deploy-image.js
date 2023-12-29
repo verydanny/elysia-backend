@@ -22465,10 +22465,10 @@ async function caproverDeploy({
       method: "POST",
       endpoint: "/user/apps/appData/" + appName + (isDetached ? "?detached=1" : ""),
       body: {
-        captainDefinitionContent: {
+        captainDefinitionContent: JSON.stringify({
           schemaVersion: 2,
           imageName
-        },
+        }),
         gitHash
       }
     });

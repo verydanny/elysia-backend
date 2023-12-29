@@ -34,10 +34,7 @@ interface CaproverBodyJSON {
   appDeployTokenConfig?: {
     enabled?: boolean
   }
-  captainDefinitionContent?: {
-    schemaVersion: 2
-    imageName?: string
-  }
+  captainDefinitionContent?: string
   gitHash?: string
 }
 
@@ -250,10 +247,10 @@ export async function caproverDeploy({
       endpoint:
         '/user/apps/appData/' + appName + (isDetached ? '?detached=1' : ''),
       body: {
-        captainDefinitionContent: {
+        captainDefinitionContent: JSON.stringify({
           schemaVersion: 2,
           imageName,
-        },
+        }),
         gitHash,
       },
     })
