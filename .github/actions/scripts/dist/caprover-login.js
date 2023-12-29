@@ -18582,12 +18582,10 @@ async function getEnableAndReturnAppToken({
 }
 async function caproverFetch(config) {
   const url = getInputUrl;
-  core2.info(`DEBUG: ${url}`);
   if (!url) {
     core2.setFailed(`Caprover: '${INPUT_URL}' input needed`);
     return;
   }
-  core2.info(`DEBUG: password ${typeof getInputPassword} ${typeof getInputAuthToken} ${config.endpoint}`);
   if (!getInputPassword && config.endpoint === "/login" || !getInputAuthToken && config.endpoint !== "/login") {
     core2.setFailed(`Caprover: you must provide a '${INPUT_AUTH_TOKEN}' or '${INPUT_PASSWORD}'`);
     return;
@@ -18621,7 +18619,6 @@ async function caproverFetch(config) {
 
 // /Users/verydanny/source/elysia-backend/.github/actions/scripts/src/caprover-login.ts
 async function run() {
-  core3.info(`OTP TOKEN: ${getInputOtpToken}`);
   try {
     const token = await getPostCaproverLogin();
     if (token) {
@@ -18629,7 +18626,7 @@ async function run() {
       core3.setSecret(token);
       return core3.setOutput(OUTPUT_AUTH_TOKEN, token);
     }
-    core3.error(`Caprover: couldn't generator token...`);
+    core3.setFailed(`Caprover: couldn't generate token...`);
   } catch (error3) {
     return core3.error(`Caprover: Something went wrong...`);
   }

@@ -83,4 +83,5 @@ jobs:
           caprover-url: ${{ secrets.CAPROVER_URL }}
           caprover-app-name: ${{ steps.caprover-create-new-app.outputs.caprover-app-name }}
           caprover-app-token: ${{ steps.caprover-create-new-app.outputs.caprover-app-token }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 

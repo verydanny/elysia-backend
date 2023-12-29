@@ -226,19 +226,11 @@ export async function getEnableAndReturnAppToken({
 export async function caproverFetch(config: CaproverFetch) {
   const url = getInputUrl
 
-  core.info(`DEBUG: ${url}`)
-
   if (!url) {
     core.setFailed(`Caprover: '${INPUT_URL}' input needed`)
 
     return
   }
-
-  core.info(
-    `DEBUG: password ${typeof getInputPassword} ${typeof getInputAuthToken} ${
-      config.endpoint
-    }`
-  )
 
   if (
     (!getInputPassword && config.endpoint === '/login') ||

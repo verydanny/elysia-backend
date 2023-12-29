@@ -10,6 +10,9 @@ inputs:
   caprover-app-name:
     description: Existing Caprover app
     required: true
+  caprover-app-token:
+    description: Existing Caprover app token
+    required: true
   github-token:
     description: Github secret for the Workflow Deployment
     required: true
