@@ -27,6 +27,9 @@ interface CaproverBodyJSON {
   otpToken?: number
   appName?: string
   hasPersistentData?: boolean
+  appDeployTokenConfig?: {
+    enabled?: boolean
+  }
 }
 
 interface CaproverFetch {
@@ -92,27 +95,27 @@ export async function getPostCaproverLogin(): Promise<string | undefined> {
   }
 }
 
-export async function getAllApps() {
+export async function getAllApps(): Promise<
+  GetAllAppsJson | STATUS.OKAY | STATUS.OKAY_BUILD_STARTED | undefined
+> {
   return caproverFetch({
     endpoint: '/user/apps/appDefinitions',
     method: 'GET',
-  })
+  }) as Promise<
+    GetAllAppsJson | STATUS.OKAY | STATUS.OKAY_BUILD_STARTED | undefined
+  >
 }
 
 export async function getPostCaproverCreateApp({
   appName,
   hasPersistentData = false,
 }: Required<Pick<CaproverBodyJSON, 'appName'>> &
-  Pick<CaproverBodyJSON, 'hasPersistentData'>) {
+  Pick<CaproverBodyJSON, 'hasPersistentData'>): Promise<string | undefined> {
   try {
-    const apps = (await getAllApps()) as
-      | GetAllAppsJson
-      | STATUS.OKAY
-      | STATUS.OKAY_BUILD_STARTED
-      | undefined
+    const allApps = await getAllApps()
 
-    if (typeof apps === 'object') {
-      const appExists = apps?.appDefinitions.some(
+    if (typeof allApps === 'object') {
+      const appExists = allApps?.appDefinitions.find(
         (app) => app.appName === appName
       )
 
@@ -120,6 +123,10 @@ export async function getPostCaproverCreateApp({
         core.info(
           `Caprover: '${appName}' app name exists...deploying new version`
         )
+
+        if (appExists && appExists?.appDeployTokenConfig.enabled) {
+          return appName
+        }
 
         return appName
       }
@@ -152,6 +159,68 @@ export async function getPostCaproverCreateApp({
   return
 }
 
+export async function getEnableAndReturnAppToken({
+  appName,
+}: Required<Pick<CaproverBodyJSON, 'appName'>>): Promise<string | undefined> {
+  try {
+    const prefetchAllApps = await getAllApps()
+
+    if (typeof prefetchAllApps === 'object') {
+      const appToken = prefetchAllApps?.appDefinitions.find(
+        (apps) => apps.appName === appName
+      )
+
+      if (appToken?.appDeployTokenConfig?.enabled) {
+        core.info(`Caprover: app token already enabled for '${appName}'`)
+
+        return appToken?.appDeployTokenConfig?.appDeployToken
+      }
+    }
+
+    const updateToEnableAppToken = await caproverFetch({
+      method: 'POST',
+      endpoint: '/user/apps/appDefinitions/update',
+      body: {
+        appName,
+        appDeployTokenConfig: {
+          enabled: true,
+        },
+      },
+    })
+
+    if (updateToEnableAppToken === STATUS.OKAY) {
+      core.info(
+        `Caprover: enabled appToken for '${appName}' \n
+        Fetching the newly created appToken...`
+      )
+
+      const allApps = await getAllApps()
+
+      if (typeof allApps === 'object') {
+        const appToken = allApps?.appDefinitions.find(
+          (apps) => apps.appName === appName
+        )
+
+        if (appToken?.appDeployTokenConfig?.enabled) {
+          return appToken?.appDeployTokenConfig?.appDeployToken
+        }
+      }
+    }
+
+    core.error(`Caprover: unable to create app token for '${appName}'`)
+
+    return
+  } catch (error) {
+    if (STATUS[(error as CaptainError).captainError]) {
+      core.setFailed(
+        `Caprover: failed with error code: ${
+          (error as CaptainError).captainError
+        }`
+      )
+    }
+  }
+}
+
 export async function caproverFetch(config: CaproverFetch) {
   const url = getInputUrl
 
@@ -173,11 +242,14 @@ export async function caproverFetch(config: CaproverFetch) {
   }
 
   try {
-    const fetchAttempt = await fetch(url + BASE_API_PATH + config.endpoint, {
-      method: config?.method,
-      body: JSON.stringify(config?.body),
-      headers: createHeaders(),
-    })
+    const fetchAttempt = await fetch(
+      new URL(url, BASE_API_PATH + config.endpoint),
+      {
+        method: config?.method,
+        body: JSON.stringify(config?.body),
+        headers: createHeaders(),
+      }
+    )
 
     const { status, data } = await (fetchAttempt.json() as Promise<{
       data: Record<string, string>

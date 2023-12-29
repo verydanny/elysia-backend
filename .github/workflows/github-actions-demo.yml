@@ -3,17 +3,12 @@ run-name: ${{ github.actor }} is testing out Github Actions 🚀
 on: [push]
 jobs:
   build-docker:
-    name: Build Docker image and push to repository
+    name: Build image and push to repository
     runs-on: ubuntu-latest
     steps:
       - 
         name: Check out repository code
         uses: actions/checkout@v4
-
-      -
-        name: Echo out information
-        run: |
-          echo "${{ github.repository }}"
 
       -
         name: Set up Docker buildx
@@ -34,24 +29,25 @@ jobs:
           push: true
           tags: ${{ github.repository }}:latest
 
-  build:
-    name: Build and Deploy
+  deploy:
+    name: Deploy
+    needs: ['build-docker']
     runs-on: ubuntu-latest
     steps:
       - 
         name: Check out repository code
         uses: actions/checkout@v4
 
-      -
-        name: Setup and Install Latest Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
+      # -
+      #   name: Setup and Install Latest Bun
+      #   uses: oven-sh/setup-bun@v1
+      #   with:
+      #     bun-version: latest
 
-      -
-        name: Install Caprover CLI
-        run: |
-          bun add caprover
+      # -
+      #   name: Install Caprover CLI
+      #   run: |
+      #     bun add caprover
 
       - 
         name: Use custom OTP Action
@@ -78,23 +74,13 @@ jobs:
           caprover-url: ${{ secrets.CAPROVER_URL }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      -
+        name: Deploy Caprover App
+        id: caprover-deploy
+        uses: caprover/deploy-from-github@v1.1.2
+        with:
+          server: ${{ secrets.CAPROVER_URL }}
+          app: ${{ steps.caprover-create-new-app.outputs.caprover-app-name }}
+          token: ${{ steps.caprover-create-new-app.outputs.caprover-app-token }}
+          image: docker.io/${{ github.repository }}:latest
 
-      # Build Docker image on Github
-      # Deploy Docker image to repository
-      # Caprover pulls image from Repository
-
-      # - name: Log into Caprover
-      #   env:
-      #     CAPROVER_OTP_TOKEN: ${{ steps.otp.outputs.otp-token }}
-      #   run: >
-      #     bunx caprover login \
-      #       -u ${{ secrets.CAPROVER_URL }} \
-      #       -p ${{ secrets.CAPROVER_PASSWORD }} \
-      #       -n ${{ secrets.CAPROVER_NAME }} \
-      
-      # - name: Deploy with Caprover
-      #   run: >
-      #     bunx caprover deploy \
-      #       -a elysia-backend \
-      #       -n ${{ secrets.CAPROVER_NAME }} \
-      #       -b ${{ github.ref_name }} \

@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url'
 import * as globals from 'globals'
 import js from '@eslint/js'
 import { FlatCompat } from '@eslint/eslintrc'
-import eslintConfigPrettier from 'eslint-plugin-prettier/recommended.js'
+import eslintConfigPrettier from 'eslint-plugin-prettier/recommended'
 import tsParser from '@typescript-eslint/parser'
 
 const __filename = fileURLToPath(import.meta.url)

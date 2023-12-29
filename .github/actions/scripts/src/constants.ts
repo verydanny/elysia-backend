@@ -22,6 +22,7 @@ export const getInputGithubToken = core.getInput(INPUT_GITHUB_TOKEN)
 
 export const OUTPUT_AUTH_TOKEN = 'caprover-auth-token'
 export const OUTPUT_APP_NAME = 'caprover-app-name'
+export const OUTPUT_APP_TOKEN = 'caprover-app-token'
 
 export enum STATUS {
   OKAY = 100,

@@ -31,6 +31,7 @@ export interface GetAllAppsJson {
     serviceUpdateOverride: string
     appDeployTokenConfig: {
       enabled: boolean
+      appDeployToken?: string
     }
     appName: string
     isAppBuilding: boolean

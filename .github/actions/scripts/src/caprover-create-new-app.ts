@@ -4,9 +4,13 @@ import { getDeleteDeployments } from './githubHelpers.js'
 import {
   INPUT_APP_NAME,
   OUTPUT_APP_NAME,
+  OUTPUT_APP_TOKEN,
   getInputAppName,
 } from './constants.js'
-import { getPostCaproverCreateApp } from './fetch.js'
+import {
+  getEnableAndReturnAppToken,
+  getPostCaproverCreateApp,
+} from './fetch.js'
 
 const SPECIAL_CHAR_REGEX = /[`~!@#$%^&*()_|+\-=?;:'",.<>{}[\]\\/]/gi
 
@@ -38,6 +42,13 @@ export async function run() {
 
     if (getCaproverRegisteredName) {
       core.setOutput(OUTPUT_APP_NAME, getCaproverRegisteredName)
+
+      const appToken = await getEnableAndReturnAppToken({ appName })
+
+      if (appToken) {
+        core.setSecret(appToken)
+        core.setOutput(OUTPUT_APP_TOKEN, appToken)
+      }
     }
 
     await getDeleteDeployments()

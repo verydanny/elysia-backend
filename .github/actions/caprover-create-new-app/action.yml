@@ -18,6 +18,8 @@ inputs:
 outputs:
   caprover-app-name:
     description: The app name that Caprover created
+  caprover-app-token:
+    description: The app token for freshly created app
 runs:
   using: 'node20'
   main: '../scripts/dist/caprover-create-new-app.js'
