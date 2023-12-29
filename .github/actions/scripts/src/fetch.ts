@@ -36,6 +36,7 @@ interface CaproverBodyJSON {
   }
   captainDefinitionContent?: string
   gitHash?: string
+  instanceCount?: number
 }
 
 interface CaproverFetch {
@@ -192,6 +193,7 @@ export async function getEnableAndReturnAppToken({
         appDeployTokenConfig: {
           enabled: true,
         },
+        instanceCount: 1,
       },
     })
 

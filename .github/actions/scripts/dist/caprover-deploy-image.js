@@ -22430,7 +22430,8 @@ async function getEnableAndReturnAppToken({
         appName,
         appDeployTokenConfig: {
           enabled: true
-        }
+        },
+        instanceCount: 1
       }
     });
     if (updateToEnableAppToken === STATUS.OKAY) {
