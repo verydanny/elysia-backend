@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import {
   TOKEN_HEADER,
-  // APP_TOKEN_HEADER,
+  APP_TOKEN_HEADER,
   NAMESPACE,
   CAPTAIN,
   STATUS,
@@ -14,6 +14,10 @@ import {
   INPUT_PASSWORD,
   INPUT_URL,
   INPUT_OTP_TOKEN,
+  getInputAppName,
+  getInputAppToken,
+  getInputImageUrl,
+  INPUT_IMAGE_URL,
 } from './constants.js'
 import { GetPostCaproverLogin, type GetAllAppsJson } from './fetchTypes.js'
 import { isEmpty } from 'rambda'
@@ -30,6 +34,11 @@ interface CaproverBodyJSON {
   appDeployTokenConfig?: {
     enabled?: boolean
   }
+  captainDefinitionContent?: {
+    schemaVersion: 2
+    imageName?: string
+  }
+  gitHash?: string
 }
 
 interface CaproverFetch {
@@ -49,10 +58,9 @@ function createHeaders() {
     headers.append(TOKEN_HEADER, getInputAuthToken)
   }
 
-  // For Later
-  // if (getInputAppToken) {
-  //   headers.append(APP_TOKEN_HEADER, appToken)
-  // }
+  if (getInputAppToken) {
+    headers.append(APP_TOKEN_HEADER, getInputAppToken)
+  }
 
   return headers
 }
@@ -222,6 +230,46 @@ export async function getEnableAndReturnAppToken({
   }
 }
 
+export async function caproverDeploy({
+  isDetached = true,
+  gitHash = '',
+}: {
+  isDetached?: boolean
+  gitHash?: string
+}) {
+  const appName = getInputAppName
+  const imageName = getInputImageUrl
+
+  if (!imageName) {
+    core.setFailed(`Caprover: you must provide a '${INPUT_IMAGE_URL}'`)
+  }
+
+  try {
+    return caproverFetch({
+      method: 'POST',
+      endpoint:
+        '/user/apps/appData/' + appName + (isDetached ? '?detached=1' : ''),
+      body: {
+        captainDefinitionContent: {
+          schemaVersion: 2,
+          imageName,
+        },
+        gitHash,
+      },
+    })
+  } catch (error) {
+    if (STATUS[(error as CaptainError).captainError]) {
+      core.error(`${error}`)
+
+      core.setFailed(
+        `Caprover: failed with error code: ${
+          (error as CaptainError).captainError
+        }`
+      )
+    }
+  }
+}
+
 export async function caproverFetch(config: CaproverFetch) {
   const url = getInputUrl
 
@@ -276,7 +324,9 @@ export async function caproverFetch(config: CaproverFetch) {
 
     return
   } catch (error) {
-    core.setFailed(`Caprover: Failed for an unknown reason`)
+    core.error(`${error}`)
+
+    core.setFailed(`Caprover: failed to fetch`)
 
     return
   }

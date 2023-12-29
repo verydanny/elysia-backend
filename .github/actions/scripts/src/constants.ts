@@ -17,6 +17,7 @@ export const INPUT_AUTH_TOKEN = 'caprover-auth-token'
 export const INPUT_APP_NAME = 'caprover-app-name'
 export const INPUT_GITHUB_TOKEN = 'github-token'
 export const INPUT_APP_TOKEN = 'caprover-app-token'
+export const INPUT_IMAGE_URL = 'caprover-image-url'
 
 export const getInputUrl = emptyStringToUndefined(core.getInput(INPUT_URL))
 export const getInputPassword = emptyStringToUndefined(
@@ -36,6 +37,9 @@ export const getInputAppToken = emptyStringToUndefined(
 )
 export const getInputGithubToken = emptyStringToUndefined(
   core.getInput(INPUT_GITHUB_TOKEN)
+)
+export const getInputImageUrl = emptyStringToUndefined(
+  core.getInput(INPUT_IMAGE_URL)
 )
 
 export const OUTPUT_AUTH_TOKEN = 'caprover-auth-token'

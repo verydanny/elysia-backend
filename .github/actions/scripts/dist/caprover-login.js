@@ -17891,6 +17891,7 @@ var emptyStringToUndefined = function(str) {
   return str === "" ? undefined : str;
 };
 var TOKEN_HEADER = "x-captain-auth";
+var APP_TOKEN_HEADER = "x-captain-app-token";
 var NAMESPACE = "x-namespace";
 var CAPTAIN = "captain";
 var BASE_API_PATH = "/api/v2";
@@ -17901,6 +17902,7 @@ var INPUT_AUTH_TOKEN = "caprover-auth-token";
 var INPUT_APP_NAME = "caprover-app-name";
 var INPUT_GITHUB_TOKEN = "github-token";
 var INPUT_APP_TOKEN = "caprover-app-token";
+var INPUT_IMAGE_URL = "caprover-image-url";
 var getInputUrl = emptyStringToUndefined(core.getInput(INPUT_URL));
 var getInputPassword = emptyStringToUndefined(core.getInput(INPUT_PASSWORD));
 var getInputOtpToken = emptyStringToUndefined(core.getInput(INPUT_OTP_TOKEN));
@@ -17908,6 +17910,7 @@ var getInputAuthToken = emptyStringToUndefined(core.getInput(INPUT_AUTH_TOKEN));
 var getInputAppName = emptyStringToUndefined(core.getInput(INPUT_APP_NAME));
 var getInputAppToken = emptyStringToUndefined(core.getInput(INPUT_APP_TOKEN));
 var getInputGithubToken = emptyStringToUndefined(core.getInput(INPUT_GITHUB_TOKEN));
+var getInputImageUrl = emptyStringToUndefined(core.getInput(INPUT_IMAGE_URL));
 var OUTPUT_AUTH_TOKEN = "caprover-auth-token";
 var OUTPUT_APP_NAME = "caprover-app-name";
 var OUTPUT_APP_TOKEN = "caprover-app-token";
@@ -18469,6 +18472,9 @@ var createHeaders = function() {
   if (getInputAuthToken) {
     headers.append(TOKEN_HEADER, getInputAuthToken);
   }
+  if (getInputAppToken) {
+    headers.append(APP_TOKEN_HEADER, getInputAppToken);
+  }
   return headers;
 };
 async function getPostCaproverLogin() {
@@ -18549,7 +18555,7 @@ async function getEnableAndReturnAppToken({
         return appToken?.appDeployTokenConfig?.appDeployToken;
       }
     }
-    core2.info(`Caprover: Enabling appToken for '${appName}'`);
+    core2.info(`Caprover: enabling appToken for '${appName}'`);
     const updateToEnableAppToken = await caproverFetch({
       method: "POST",
       endpoint: "/user/apps/appDefinitions/update",
@@ -18561,8 +18567,7 @@ async function getEnableAndReturnAppToken({
       }
     });
     if (updateToEnableAppToken === STATUS.OKAY) {
-      core2.info(`Caprover: enabled appToken for '${appName}' \n
-        Fetching the newly created appToken...`);
+      core2.info(`Caprover: enabled appToken for '${appName}'\nFetching the newly created appToken...`);
       const allApps = await getAllApps();
       if (typeof allApps === "object") {
         const appToken = allApps?.appDefinitions.find((apps) => apps.appName === appName);
@@ -18571,10 +18576,38 @@ async function getEnableAndReturnAppToken({
         }
       }
     }
-    core2.error(`Caprover: unable to create app token for '${appName}'`);
+    core2.setFailed(`Caprover: unable to create app token for '${appName}'`);
     return;
   } catch (error2) {
     if (STATUS[error2.captainError]) {
+      core2.setFailed(`Caprover: failed with error code: ${error2.captainError}`);
+    }
+  }
+}
+async function caproverDeploy({
+  isDetached = true,
+  gitHash = ""
+}) {
+  const appName = getInputAppName;
+  const imageName = getInputImageUrl;
+  if (!imageName) {
+    core2.setFailed(`Caprover: you must provide a '${INPUT_IMAGE_URL}'`);
+  }
+  try {
+    return caproverFetch({
+      method: "POST",
+      endpoint: "/user/apps/appData/" + appName + (isDetached ? "?detached=1" : ""),
+      body: {
+        captainDefinitionContent: {
+          schemaVersion: 2,
+          imageName
+        },
+        gitHash
+      }
+    });
+  } catch (error2) {
+    if (STATUS[error2.captainError]) {
+      core2.error(`${error2}`);
       core2.setFailed(`Caprover: failed with error code: ${error2.captainError}`);
     }
   }
@@ -18611,7 +18644,8 @@ async function caproverFetch(config) {
     }
     return;
   } catch (error2) {
-    core2.setFailed(`Caprover: Failed for an unknown reason`);
+    core2.error(`${error2}`);
+    core2.setFailed(`Caprover: failed to fetch`);
     return;
   }
 }

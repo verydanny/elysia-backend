@@ -1,6 +1,5 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { getDeleteDeployments } from './githubHelpers.js'
 import {
   INPUT_APP_NAME,
   OUTPUT_APP_NAME,
@@ -52,7 +51,6 @@ export async function run() {
       }
     }
 
-    await getDeleteDeployments()
     // const getCreateDeployment = await octokit.rest.repos.createDeployment({
     //   owner: github.context.repo.owner,
     //   repo: github.context.repo.repo,

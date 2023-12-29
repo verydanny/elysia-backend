@@ -21716,11 +21716,7 @@ var require_github = __commonJS((exports) => {
 });
 
 // /Users/verydanny/source/elysia-backend/.github/actions/scripts/src/caprover-create-new-app.ts
-var core4 = __toESM(require_core(), 1);
-var github2 = __toESM(require_github(), 1);
-
-// /Users/verydanny/source/elysia-backend/.github/actions/scripts/src/githubHelpers.ts
-var core2 = __toESM(require_core(), 1);
+var core3 = __toESM(require_core(), 1);
 var github = __toESM(require_github(), 1);
 
 // /Users/verydanny/source/elysia-backend/.github/actions/scripts/src/constants.ts
@@ -21729,6 +21725,7 @@ var emptyStringToUndefined = function(str) {
   return str === "" ? undefined : str;
 };
 var TOKEN_HEADER = "x-captain-auth";
+var APP_TOKEN_HEADER = "x-captain-app-token";
 var NAMESPACE = "x-namespace";
 var CAPTAIN = "captain";
 var BASE_API_PATH = "/api/v2";
@@ -21739,6 +21736,7 @@ var INPUT_AUTH_TOKEN = "caprover-auth-token";
 var INPUT_APP_NAME = "caprover-app-name";
 var INPUT_GITHUB_TOKEN = "github-token";
 var INPUT_APP_TOKEN = "caprover-app-token";
+var INPUT_IMAGE_URL = "caprover-image-url";
 var getInputUrl = emptyStringToUndefined(core.getInput(INPUT_URL));
 var getInputPassword = emptyStringToUndefined(core.getInput(INPUT_PASSWORD));
 var getInputOtpToken = emptyStringToUndefined(core.getInput(INPUT_OTP_TOKEN));
@@ -21746,6 +21744,7 @@ var getInputAuthToken = emptyStringToUndefined(core.getInput(INPUT_AUTH_TOKEN));
 var getInputAppName = emptyStringToUndefined(core.getInput(INPUT_APP_NAME));
 var getInputAppToken = emptyStringToUndefined(core.getInput(INPUT_APP_TOKEN));
 var getInputGithubToken = emptyStringToUndefined(core.getInput(INPUT_GITHUB_TOKEN));
+var getInputImageUrl = emptyStringToUndefined(core.getInput(INPUT_IMAGE_URL));
 var OUTPUT_AUTH_TOKEN = "caprover-auth-token";
 var OUTPUT_APP_NAME = "caprover-app-name";
 var OUTPUT_APP_TOKEN = "caprover-app-token";
@@ -21773,34 +21772,8 @@ var STATUS;
   STATUS2[STATUS2["UNKNOWN_ERROR"] = 1999] = "UNKNOWN_ERROR";
 })(STATUS || (STATUS = {}));
 
-// /Users/verydanny/source/elysia-backend/.github/actions/scripts/src/githubHelpers.ts
-async function getDeleteDeployments() {
-  if (!getInputGithubToken) {
-    core2.notice(`Caprover: missing '${INPUT_GITHUB_TOKEN}', can't post deployment link`);
-    return;
-  }
-  const octokit = github.getOctokit(getInputGithubToken);
-  const parameters = {
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo
-  };
-  const getDeployments = await octokit.rest.repos.listDeployments(parameters);
-  if (getDeployments.status === 200) {
-    if (getDeleteDeployments.length === 0) {
-      core2.info(`Caprover: no deployments to delete...`);
-      return;
-    }
-    const deleteDeployments = getDeployments.data.map(({ id }) => octokit.rest.repos.deleteDeployment({
-      ...parameters,
-      deployment_id: id
-    }));
-    return (await Promise.allSettled(deleteDeployments)).some((promise) => promise.status === "rejected" ? false : promise.status === "fulfilled" && promise.value.status !== 204 ? false : true);
-  }
-  return;
-}
-
 // /Users/verydanny/source/elysia-backend/.github/actions/scripts/src/fetch.ts
-var core3 = __toESM(require_core(), 1);
+var core2 = __toESM(require_core(), 1);
 
 // node_modules/rambda/dist/rambda.js
 var curry = function(fn, args = []) {
@@ -22336,13 +22309,16 @@ var createHeaders = function() {
   if (getInputAuthToken) {
     headers.append(TOKEN_HEADER, getInputAuthToken);
   }
+  if (getInputAppToken) {
+    headers.append(APP_TOKEN_HEADER, getInputAppToken);
+  }
   return headers;
 };
 async function getPostCaproverLogin() {
   const password = getInputPassword;
   const otpToken = Number(getInputOtpToken);
   if (!password) {
-    core3.setFailed(`Caprover: '${INPUT_PASSWORD}' input needed for login`);
+    core2.setFailed(`Caprover: '${INPUT_PASSWORD}' input needed for login`);
     return;
   }
   try {
@@ -22354,13 +22330,13 @@ async function getPostCaproverLogin() {
         ...otpToken && !isNaN(otpToken) ? { otpToken } : {}
       }
     });
-    core3.info(`Login result ${loginResult}`);
+    core2.info(`Login result ${loginResult}`);
     if (loginResult && typeof loginResult === "object") {
       return loginResult.token;
     }
   } catch (error2) {
     if (error2.captainError === 1114) {
-      core3.setFailed(`Caprover: you must provide an OTP Token, passed in as '${INPUT_OTP_TOKEN}'`);
+      core2.setFailed(`Caprover: you must provide an OTP Token, passed in as '${INPUT_OTP_TOKEN}'`);
       return;
     }
   }
@@ -22380,7 +22356,7 @@ async function getPostCaproverCreateApp({
     if (typeof allApps === "object") {
       const appExists = allApps?.appDefinitions.find((app) => app.appName === appName);
       if (appExists?.appName) {
-        core3.info(`Caprover: '${appName}' app name exists...deploying new version`);
+        core2.info(`Caprover: '${appName}' app name exists...deploying new version`);
         return appName;
       }
     }
@@ -22393,12 +22369,12 @@ async function getPostCaproverCreateApp({
       }
     });
     if (registerApp === STATUS.OKAY) {
-      core3.info(`Caprover: successfully registered name: '${appName}'`);
+      core2.info(`Caprover: successfully registered name: '${appName}'`);
       return appName;
     }
   } catch (error2) {
     if (STATUS[error2.captainError]) {
-      core3.setFailed(`Caprover: failed with error code: ${error2.captainError}`);
+      core2.setFailed(`Caprover: failed with error code: ${error2.captainError}`);
     }
   }
   return;
@@ -22407,16 +22383,16 @@ async function getEnableAndReturnAppToken({
   appName
 }) {
   try {
-    core3.info(`Caprover: prefetching to check for existing appToken`);
+    core2.info(`Caprover: prefetching to check for existing appToken`);
     const prefetchAllApps = await getAllApps();
     if (typeof prefetchAllApps === "object") {
       const appToken = prefetchAllApps?.appDefinitions.find((apps) => apps.appName === appName);
       if (appToken?.appDeployTokenConfig?.enabled) {
-        core3.info(`Caprover: app token already enabled for '${appName}'`);
+        core2.info(`Caprover: app token already enabled for '${appName}'`);
         return appToken?.appDeployTokenConfig?.appDeployToken;
       }
     }
-    core3.info(`Caprover: Enabling appToken for '${appName}'`);
+    core2.info(`Caprover: enabling appToken for '${appName}'`);
     const updateToEnableAppToken = await caproverFetch({
       method: "POST",
       endpoint: "/user/apps/appDefinitions/update",
@@ -22428,8 +22404,7 @@ async function getEnableAndReturnAppToken({
       }
     });
     if (updateToEnableAppToken === STATUS.OKAY) {
-      core3.info(`Caprover: enabled appToken for '${appName}' \n
-        Fetching the newly created appToken...`);
+      core2.info(`Caprover: enabled appToken for '${appName}'\nFetching the newly created appToken...`);
       const allApps = await getAllApps();
       if (typeof allApps === "object") {
         const appToken = allApps?.appDefinitions.find((apps) => apps.appName === appName);
@@ -22438,22 +22413,50 @@ async function getEnableAndReturnAppToken({
         }
       }
     }
-    core3.error(`Caprover: unable to create app token for '${appName}'`);
+    core2.setFailed(`Caprover: unable to create app token for '${appName}'`);
     return;
   } catch (error2) {
     if (STATUS[error2.captainError]) {
-      core3.setFailed(`Caprover: failed with error code: ${error2.captainError}`);
+      core2.setFailed(`Caprover: failed with error code: ${error2.captainError}`);
+    }
+  }
+}
+async function caproverDeploy({
+  isDetached = true,
+  gitHash = ""
+}) {
+  const appName = getInputAppName;
+  const imageName = getInputImageUrl;
+  if (!imageName) {
+    core2.setFailed(`Caprover: you must provide a '${INPUT_IMAGE_URL}'`);
+  }
+  try {
+    return caproverFetch({
+      method: "POST",
+      endpoint: "/user/apps/appData/" + appName + (isDetached ? "?detached=1" : ""),
+      body: {
+        captainDefinitionContent: {
+          schemaVersion: 2,
+          imageName
+        },
+        gitHash
+      }
+    });
+  } catch (error2) {
+    if (STATUS[error2.captainError]) {
+      core2.error(`${error2}`);
+      core2.setFailed(`Caprover: failed with error code: ${error2.captainError}`);
     }
   }
 }
 async function caproverFetch(config) {
   const url = getInputUrl;
   if (!url) {
-    core3.setFailed(`Caprover: '${INPUT_URL}' input needed`);
+    core2.setFailed(`Caprover: '${INPUT_URL}' input needed`);
     return;
   }
   if (!getInputPassword && config.endpoint === "/login" || !getInputAuthToken && config.endpoint !== "/login") {
-    core3.setFailed(`Caprover: you must provide a '${INPUT_AUTH_TOKEN}' or '${INPUT_PASSWORD}'`);
+    core2.setFailed(`Caprover: you must provide a '${INPUT_AUTH_TOKEN}' or '${INPUT_PASSWORD}'`);
     return;
   }
   try {
@@ -22464,7 +22467,7 @@ async function caproverFetch(config) {
     });
     const { status, data } = await fetchAttempt.json();
     if (status !== STATUS.OKAY && status !== STATUS.OKAY_BUILD_STARTED) {
-      core3.setFailed(`\n
+      core2.setFailed(`\n
         Caprover: unknown Error, status: ${status}\n
         file an issue: https://github.com/caprover/caprover/issues
       `);
@@ -22478,7 +22481,8 @@ async function caproverFetch(config) {
     }
     return;
   } catch (error2) {
-    core3.setFailed(`Caprover: Failed for an unknown reason`);
+    core2.error(`${error2}`);
+    core2.setFailed(`Caprover: failed to fetch`);
     return;
   }
 }
@@ -22486,10 +22490,10 @@ async function caproverFetch(config) {
 // /Users/verydanny/source/elysia-backend/.github/actions/scripts/src/caprover-create-new-app.ts
 var generateAppName = function(appName) {
   if (!appName) {
-    core4.info(`Caprover: '${INPUT_APP_NAME}' not set, generating one...`);
-    const githubRef = github2.context.ref.replace(SPECIAL_CHAR_REGEX, "").replace(/refs?/gi, "").replace(/heads?/gi, "");
-    const githubRepo = github2.context.repo.repo.replace(SPECIAL_CHAR_REGEX, "");
-    core4.info(`Caprover: generated app name: '${githubRepo}-${githubRef}'`);
+    core3.info(`Caprover: '${INPUT_APP_NAME}' not set, generating one...`);
+    const githubRef = github.context.ref.replace(SPECIAL_CHAR_REGEX, "").replace(/refs?/gi, "").replace(/heads?/gi, "");
+    const githubRepo = github.context.repo.repo.replace(SPECIAL_CHAR_REGEX, "");
+    core3.info(`Caprover: generated app name: '${githubRepo}-${githubRef}'`);
     return `${githubRepo}-${githubRef}`;
   }
   return appName;
@@ -22501,16 +22505,15 @@ async function run() {
       appName
     });
     if (getCaproverRegisteredName) {
-      core4.info(`Caprover: setting output '${getCaproverRegisteredName}'`);
-      core4.setOutput(OUTPUT_APP_NAME, getCaproverRegisteredName);
+      core3.info(`Caprover: setting output '${getCaproverRegisteredName}'`);
+      core3.setOutput(OUTPUT_APP_NAME, getCaproverRegisteredName);
       const appToken = await getEnableAndReturnAppToken({ appName });
       if (appToken) {
-        core4.setOutput(OUTPUT_APP_TOKEN, appToken);
+        core3.setOutput(OUTPUT_APP_TOKEN, appToken);
       }
     }
-    await getDeleteDeployments();
   } catch (error3) {
-    core4.error(`${error3}`);
+    core3.error(`${error3}`);
   }
 }
 var SPECIAL_CHAR_REGEX = /[`~!@#$%^&*()_|+\-=?;:'",.<>{}[\]\\/]/gi;
