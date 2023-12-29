@@ -22351,6 +22351,7 @@ async function getPostCaproverLogin() {
         ...otpToken ? { otpToken } : {}
       }
     });
+    core3.info(`Login result ${loginResult}`);
     if (loginResult && typeof loginResult === "object") {
       return loginResult.token;
     }
