@@ -6,25 +6,35 @@ jobs:
     name: Build and Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository code
+      - 
+        name: Check out repository code
         uses: actions/checkout@v4
 
-      - name: Setup and Install Latest Bun
+      -
+        name: Echo out information
+        run: |
+          echo "${{ github.repository }}"
+
+      - 
+        name: Setup and Install Latest Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
 
-      - name: Install Caprover CLI
+      - 
+        name: Install Caprover CLI
         run: |
           bun add caprover
 
-      - name: Use custom OTP Action
+      - 
+        name: Use custom OTP Action
         id: otp
         uses: verydanny/actions-otp@v1.0.4
         with:
           otp-url: ${{ secrets.CAPROVER_SECRET }}
 
-      - name: Log into Caprover
+      - 
+        name: Log into Caprover
         id: caprover-login
         uses: ./.github/actions/caprover-login
         with:
@@ -32,13 +42,34 @@ jobs:
           caprover-otp: ${{ steps.otp.outputs.otp-token }}
           caprover-url: ${{ secrets.CAPROVER_URL }}
 
-      - name: Create new Caprover App and Post URL
+      - 
+        name: Create new Caprover App and Post URL
         id: caprover-create-new-app
         uses: ./.github/actions/caprover-create-new-app
         with:
           caprover-auth-token: ${{ steps.caprover-login.outputs.caprover-auth-token }}
           caprover-url: ${{ secrets.CAPROVER_URL }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - 
+        name: Set up Docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - 
+        name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+          password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
+      
+      - 
+        name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_REGISTRY_USERNAME }}/${{ github.repository }}:latest
+
 
       # Build Docker image on Github
       # Deploy Docker image to repository
