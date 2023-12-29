@@ -79,8 +79,8 @@ jobs:
         id: caprover-deploy
         uses: caprover/deploy-from-github@v1.1.2
         with:
-          server: ${{ secrets.CAPROVER_URL }}
-          app: ${{ steps.caprover-create-new-app.outputs.caprover-app-name }}
-          token: ${{ steps.caprover-create-new-app.outputs.caprover-app-token }}
-          image: docker.io/${{ github.repository }}:latest
+          server: '${{ secrets.CAPROVER_URL }}'
+          app: '${{ steps.caprover-create-new-app.outputs.caprover-app-name }}'
+          token: '${{ steps.caprover-create-new-app.outputs.caprover-app-token }}'
+          image: 'docker.io/${{ github.repository }}:latest'
 
