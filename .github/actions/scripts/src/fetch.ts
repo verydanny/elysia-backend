@@ -17,6 +17,7 @@ import {
 } from './constants.js'
 import { GetPostCaproverLogin, type GetAllAppsJson } from './fetchTypes.js'
 import { isEmpty } from 'rambda'
+import { URL } from 'url'
 
 interface CaptainError extends Error {
   captainError: Exclude<STATUS, STATUS.OKAY | STATUS.OKAY_BUILD_STARTED>
