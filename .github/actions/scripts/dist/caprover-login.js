@@ -18584,7 +18584,7 @@ async function caproverFetch(config) {
     core2.setFailed(`Caprover: '${INPUT_URL}' input needed`);
     return;
   }
-  core2.info(`DEBUG: ${getInputPassword} ${getInputAuthToken} ${config.endpoint}`);
+  core2.info(`DEBUG: password ${typeof getInputPassword} ${typeof getInputAuthToken} ${config.endpoint}`);
   if (!getInputPassword && config.endpoint === "/login" || !getInputAuthToken && config.endpoint !== "/login") {
     core2.setFailed(`Caprover: you must provide a '${INPUT_AUTH_TOKEN}' or '${INPUT_PASSWORD}'`);
     return;

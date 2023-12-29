@@ -235,7 +235,9 @@ export async function caproverFetch(config: CaproverFetch) {
   }
 
   core.info(
-    `DEBUG: ${getInputPassword} ${getInputAuthToken} ${config.endpoint}`
+    `DEBUG: password ${typeof getInputPassword} ${typeof getInputAuthToken} ${
+      config.endpoint
+    }`
   )
 
   if (
