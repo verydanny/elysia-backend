@@ -69,7 +69,7 @@ export async function getPostCaproverLogin(): Promise<string | undefined> {
   const otpToken = Number(getInputOtpToken)
 
   if (!password) {
-    core.setFailed(`Caprover: '${INPUT_PASSWORD}' input needed for login`)
+    core.setFailed(`Caprover: '${INPUT_PASSWORD}' input needed for login.`)
 
     return
   }
@@ -130,7 +130,7 @@ export async function getPostCaproverCreateApp({
 
       if (appExists?.appName) {
         core.info(
-          `Caprover: '${appName}' app name exists...deploying new version`
+          `Caprover: '${appName}' app name exists...deploying new version.`
         )
 
         return appName
@@ -147,7 +147,7 @@ export async function getPostCaproverCreateApp({
     })
 
     if (registerApp === STATUS.OKAY) {
-      core.info(`Caprover: successfully registered name: '${appName}'`)
+      core.info(`Caprover: '${appName}' successfully registered.`)
 
       return appName
     }
@@ -164,11 +164,11 @@ export async function getPostCaproverCreateApp({
   return
 }
 
-export async function getEnableAndReturnAppToken({
+export async function getPostEnableAndReturnAppToken({
   appName,
 }: Required<Pick<CaproverBodyJSON, 'appName'>>): Promise<string | undefined> {
   try {
-    core.info(`Caprover: prefetching to check for existing appToken`)
+    core.info(`Caprover: prefetching to check for existing appToken.`)
 
     const prefetchAllApps = await getAllApps()
 
@@ -178,13 +178,13 @@ export async function getEnableAndReturnAppToken({
       )
 
       if (appToken?.appDeployTokenConfig?.enabled) {
-        core.info(`Caprover: app token already enabled for '${appName}'`)
+        core.info(`Caprover: '${appName}' token already enabled.`)
 
         return appToken?.appDeployTokenConfig?.appDeployToken
       }
     }
 
-    core.info(`Caprover: enabling appToken for '${appName}'`)
+    core.info(`Caprover: '${appName}'...enabling token.`)
 
     const updateToEnableAppToken = await caproverFetch({
       method: 'POST',
@@ -199,7 +199,7 @@ export async function getEnableAndReturnAppToken({
 
     if (updateToEnableAppToken === STATUS.OKAY) {
       core.info(
-        `Caprover: enabled appToken for '${appName}'\nFetching the newly created appToken...`
+        `Caprover: '${appName}'...enabled appToken.\nFetching the newly created appToken...`
       )
 
       const allApps = await getAllApps()
@@ -215,7 +215,7 @@ export async function getEnableAndReturnAppToken({
       }
     }
 
-    core.setFailed(`Caprover: unable to create app token for '${appName}'`)
+    core.setFailed(`Caprover: '${appName}' unable to create app token.`)
 
     return
   } catch (error) {
@@ -229,6 +229,33 @@ export async function getEnableAndReturnAppToken({
   }
 }
 
+export async function getPostEnableInstance({ appName }: { appName?: string }) {
+  return (
+    appName &&
+    caproverFetch({
+      method: 'POST',
+      endpoint: '/user/apps/appDefinitions/update',
+      body: {
+        appName,
+        instanceCount: 1,
+      },
+    })
+  )
+}
+
+export async function getPostEnableSsl({ appName }: { appName?: string }) {
+  return (
+    appName &&
+    caproverFetch({
+      method: 'POST',
+      endpoint: '/user/apps/appDefinitions/enablebasedomainssl',
+      body: {
+        appName,
+      },
+    })
+  )
+}
+
 export async function caproverDeploy({
   isDetached = true,
   gitHash = '',
@@ -240,20 +267,20 @@ export async function caproverDeploy({
   const imageName = getInputImageUrl
 
   if (!imageName) {
-    core.setFailed(`Caprover: you must provide a '${INPUT_IMAGE_URL}'`)
+    core.setFailed(`Caprover: no '${INPUT_IMAGE_URL}' provided.`)
   }
 
   try {
-    const enableInstance = await caproverFetch({
-      method: 'POST',
-      endpoint: '/user/apps/appDefinitions/update',
-      body: {
-        appName,
-        instanceCount: 1,
-      },
-    })
+    const preDeploySteps = await Promise.all(
+      [getPostEnableInstance, getPostEnableSsl].map((promiseFn) =>
+        promiseFn({ appName })
+      )
+    )
 
-    if (enableInstance === STATUS.OKAY) {
+    if (
+      preDeploySteps[0] === STATUS.OKAY &&
+      preDeploySteps[1] === STATUS.OKAY
+    ) {
       const startDeploy = await caproverFetch({
         method: 'POST',
         endpoint:
@@ -268,18 +295,11 @@ export async function caproverDeploy({
       })
 
       if (startDeploy === STATUS.OKAY_BUILD_STARTED) {
-        // caproverFetch({
-        //   method: 'POST',
-        //   endpoint: '/user/apps/appDefinitions/enablebasedomainssl',
-        //   body: {
-        //     appName,
-        //   },
-        // })
         return startDeploy
       }
     }
 
-    core.info(`${enableInstance}`)
+    core.info(`${preDeploySteps}`)
   } catch (error) {
     if (STATUS[(error as CaptainError).captainError]) {
       core.error(`${error}`)
@@ -297,7 +317,7 @@ export async function caproverFetch(config: CaproverFetch) {
   const url = getInputUrl
 
   if (!url) {
-    core.setFailed(`Caprover: '${INPUT_URL}' input needed`)
+    core.setFailed(`Caprover: '${INPUT_URL}' needed.`)
 
     return
   }

@@ -10,6 +10,8 @@ export async function run() {
       core.info(`Caprover: Logged in Successfully.`)
       core.setSecret(token)
 
+      core.info(`Caprover: '${OUTPUT_AUTH_TOKEN}' set.`)
+
       return core.setOutput(OUTPUT_AUTH_TOKEN, token)
     }
 

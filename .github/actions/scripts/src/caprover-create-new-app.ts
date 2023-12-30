@@ -40,13 +40,17 @@ export async function run() {
     })
 
     if (getCaproverRegisteredName) {
-      core.info(`Caprover: setting output '${getCaproverRegisteredName}'`)
+      core.info(`Caprover: '${OUTPUT_APP_NAME}' set.`)
+      core.setSecret(getCaproverRegisteredName)
 
       core.setOutput(OUTPUT_APP_NAME, getCaproverRegisteredName)
 
       const appToken = await getEnableAndReturnAppToken({ appName })
 
       if (appToken) {
+        core.info(`Caprover: '${OUTPUT_APP_TOKEN}' set.`)
+        core.setSecret(appToken)
+
         core.setOutput(OUTPUT_APP_TOKEN, appToken)
       }
     }
