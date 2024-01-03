@@ -1,9 +1,6 @@
 name: 'Caprover: Deploy Image'
 description: 'Deploy image from logged-in Caprover instance'
 inputs:
-  caprover-auth-token:
-    description: Auth-token to log into Caprover instances
-    required: true
   caprover-url:
     description: The URL of the Caprover instance
     required: true

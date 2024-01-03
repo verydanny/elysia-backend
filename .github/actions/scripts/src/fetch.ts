@@ -283,14 +283,9 @@ export async function caproverDeploy({
   }
 
   try {
-    const preDeploySteps = await Promise.all(
-      [getPostEnableInstance].map((promiseFn) => promiseFn({ appName }))
-    )
+    const enableInstance = await getPostEnableInstance({ appName })
 
-    if (
-      preDeploySteps[0] === STATUS.OKAY &&
-      preDeploySteps[1] === STATUS.OKAY
-    ) {
+    if (enableInstance === STATUS.OKAY) {
       const startDeploy = await caproverFetch({
         method: 'POST',
         endpoint:
@@ -308,8 +303,6 @@ export async function caproverDeploy({
         return startDeploy
       }
     }
-
-    core.info(`${preDeploySteps}`)
   } catch (error) {
     if (STATUS[(error as CaptainError).captainError]) {
       core.error(`${error}`)

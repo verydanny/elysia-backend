@@ -22482,8 +22482,8 @@ async function caproverDeploy({
     core3.setFailed(`Caprover: no '${INPUT_IMAGE_URL}' provided.`);
   }
   try {
-    const preDeploySteps = await Promise.all([getPostEnableInstance].map((promiseFn) => promiseFn({ appName })));
-    if (preDeploySteps[0] === STATUS.OKAY && preDeploySteps[1] === STATUS.OKAY) {
+    const enableInstance = await getPostEnableInstance({ appName });
+    if (enableInstance === STATUS.OKAY) {
       const startDeploy = await caproverFetch({
         method: "POST",
         endpoint: "/user/apps/appData/" + appName + (isDetached ? "?detached=1" : ""),
@@ -22499,7 +22499,6 @@ async function caproverDeploy({
         return startDeploy;
       }
     }
-    core3.info(`${preDeploySteps}`);
   } catch (error2) {
     if (STATUS[error2.captainError]) {
       core3.error(`${error2}`);
