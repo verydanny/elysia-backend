@@ -4,6 +4,9 @@ inputs:
   caprover-url:
     description: The URL of the Caprover instance
     required: true
+  caprover-auth-token:
+    description: Existing Caprover auth token
+    required: true
   caprover-app-name:
     description: Existing Caprover app
     required: true

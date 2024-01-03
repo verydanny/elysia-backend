@@ -83,6 +83,7 @@ jobs:
         uses: ./.github/actions/caprover-deploy-image
         with:
           caprover-url: ${{ secrets.CAPROVER_URL }}
+          caprover-auth-token: ${{ steps.caprover-login.outputs.caprover-auth-token }}
           caprover-app-name: ${{ steps.caprover-create-new-app.outputs.caprover-app-name }}
           caprover-app-token: ${{ steps.caprover-create-new-app.outputs.caprover-app-token }}
           caprover-image-url: docker.io/${{ github.repository }}:latest
