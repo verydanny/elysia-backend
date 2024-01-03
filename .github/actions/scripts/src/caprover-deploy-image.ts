@@ -13,7 +13,7 @@ function getEnvForDeployment(
 
     if (matchResult) {
       const stringified = JSON.stringify({
-        key: [matchResult],
+        key: matchResult,
         value: env[currentEnv],
       })
 

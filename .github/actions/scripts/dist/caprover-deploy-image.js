@@ -22558,7 +22558,7 @@ var getEnvForDeployment = function(env) {
     const matchResult = Array.isArray(matchEnv) && matchEnv[1];
     if (matchResult) {
       const stringified = JSON.stringify({
-        key: [matchResult],
+        key: matchResult,
         value: env[currentEnv]
       });
       return [...envArray, stringified];
