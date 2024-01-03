@@ -22505,13 +22505,13 @@ async function getPostEnableInstance({
           preDeployFunction: getApp?.preDeployFunction,
           envVars: getApp?.envVars,
           appDeployTokenConfig: getApp?.appDeployTokenConfig,
-          ...getApp?.instanceCount == 0 ? { instanceCount: 1 } : {},
+          ...Number(getApp?.instanceCount) === 0 ? { instanceCount: 1 } : {},
           ...Array.isArray(envVars) && envVars.length > 0 ? { envVars } : {}
         }
       });
       return createEnableInstance;
     } catch (error2) {
-      core3.info(`Failed: getPostEnableInstance ${error2}`);
+      core3.info(`Failed: getPostEnableInstance() ${error2}`);
       if (STATUS[error2.captainError]) {
         core3.setFailed(`Caprover: failed with error code: ${error2.captainError}`);
       }
@@ -22592,8 +22592,8 @@ async function caproverFetch(config) {
     }
     return;
   } catch (error2) {
+    core3.error(`${error2}`);
     if (STATUS[error2.captainError]) {
-      core3.error(`${error2}`);
       core3.setFailed(`Caprover: failed with error code: ${error2.captainError}`);
     }
     return;

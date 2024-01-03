@@ -297,14 +297,14 @@ export async function getPostEnableInstance({
           preDeployFunction: getApp?.preDeployFunction,
           envVars: getApp?.envVars,
           appDeployTokenConfig: getApp?.appDeployTokenConfig,
-          ...(getApp?.instanceCount == 0 ? { instanceCount: 1 } : {}),
+          ...(Number(getApp?.instanceCount) === 0 ? { instanceCount: 1 } : {}),
           ...(Array.isArray(envVars) && envVars.length > 0 ? { envVars } : {}),
         },
       })
 
       return createEnableInstance
     } catch (error) {
-      core.info(`Failed: getPostEnableInstance ${error}`)
+      core.info(`Failed: getPostEnableInstance() ${error}`)
 
       if (STATUS[(error as CaptainError).captainError]) {
         core.setFailed(
@@ -442,9 +442,9 @@ export async function caproverFetch(config: CaproverFetch) {
 
     return
   } catch (error) {
-    if (STATUS[(error as CaptainError).captainError]) {
-      core.error(`${error}`)
+    core.error(`${error}`)
 
+    if (STATUS[(error as CaptainError).captainError]) {
       core.setFailed(
         `Caprover: failed with error code: ${
           (error as CaptainError).captainError
