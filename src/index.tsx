@@ -3,8 +3,8 @@ import { Elysia } from 'elysia'
 // import { html } from '@elysiajs/html'
 import { user } from './controller/user.js'
 
-const app = new Elysia()
-  .group('/api', (app) => app.use(user))
+const app = new Elysia({ prefix: '/api' })
+  .use(user)
   .listen(Bun.env.PORT || 3000)
 
 export type App = typeof app

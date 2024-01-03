@@ -1,45 +1,62 @@
 import { Elysia } from 'elysia'
-import { supabase } from '../supabase.js'
+import { supabasePlugin } from '../supabase.js'
 import { authModel } from '../model/signup.model.js'
 
-function signup(app: Elysia<'/user'>) {
+function signup(app: typeof supabasePlugin) {
   return app.post(
-    '/sign-up',
-    async ({ body }) => {
+    '/signup',
+    async ({ body, supabase }) => {
       const { username, password } = body
 
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: username,
         password,
         options: {
-          emailRedirectTo: 'http://localhost:3000/api/user/confirm',
+          emailRedirectTo: `${Bun.env.ORIGIN}/api/user/confirm`,
         },
       })
 
-      return {
-        data,
-        error,
+      if (!error) {
+        return `Sign-Up Successful`
       }
     },
     { body: authModel }
   )
 }
 
-function signin(app: Elysia<'/user'>) {
-  return app.post('/sign-in', () => 'Sign In', {
-    body: authModel,
-  })
+function signin(app: typeof supabasePlugin) {
+  return app.post(
+    '/signin',
+    async ({ body, supabase }) => {
+      const { username, password } = body
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: username,
+        password,
+      })
+
+      if (!error) {
+        return 'Login Successful'
+      }
+    },
+    {
+      body: authModel,
+    }
+  )
 }
 
-function confirm(app: Elysia<'/user'>) {
-  return app.get('/confirm', ({ set }) => {
-    set.headers['Content-Type'] = 'text/html'
+function signout(app: typeof supabasePlugin) {
+  return app.post('/signout', async ({ supabase }) => {
+    const { error } = await supabase.auth.signOut({ scope: 'global' })
 
-    return `<h1>Congrats you're registered</h1>`
+    if (!error) {
+      return 'Logout Successful'
+    }
   })
 }
 
 export const user = new Elysia({ prefix: '/user' })
+  .use(supabasePlugin)
   .use(signup)
   .use(signin)
-  .use(confirm)
+  .use(signout)
