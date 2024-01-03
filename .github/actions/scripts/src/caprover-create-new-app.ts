@@ -7,7 +7,7 @@ import {
   getInputAppName,
 } from './constants.js'
 import {
-  getEnableAndReturnAppToken,
+  getPostEnableAndReturnAppToken,
   getPostCaproverCreateApp,
 } from './fetch.js'
 
@@ -45,7 +45,7 @@ export async function run() {
 
       core.setOutput(OUTPUT_APP_NAME, getCaproverRegisteredName)
 
-      const appToken = await getEnableAndReturnAppToken({ appName })
+      const appToken = await getPostEnableAndReturnAppToken({ appName })
 
       if (appToken) {
         core.info(`Caprover: '${OUTPUT_APP_TOKEN}' set.`)

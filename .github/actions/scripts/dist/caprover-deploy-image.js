@@ -21728,6 +21728,7 @@ var core = __toESM(require_core(), 1);
 var emptyStringToUndefined = function(str) {
   return str === "" ? undefined : str;
 };
+var CAP_ENV_REGEX = /^cap_/gi;
 var TOKEN_HEADER = "x-captain-auth";
 var APP_TOKEN_HEADER = "x-captain-app-token";
 var NAMESPACE = "x-namespace";
@@ -22348,7 +22349,7 @@ async function getPostCaproverLogin() {
   const password = getInputPassword;
   const otpToken = Number(getInputOtpToken);
   if (!password) {
-    core3.setFailed(`Caprover: '${INPUT_PASSWORD}' input needed for login`);
+    core3.setFailed(`Caprover: '${INPUT_PASSWORD}' input needed for login.`);
     return;
   }
   try {
@@ -22386,7 +22387,7 @@ async function getPostCaproverCreateApp({
     if (typeof allApps === "object") {
       const appExists = allApps?.appDefinitions.find((app) => app.appName === appName);
       if (appExists?.appName) {
-        core3.info(`Caprover: '${appName}' app name exists...deploying new version`);
+        core3.info(`Caprover: '${appName}' app name exists...deploying new version.`);
         return appName;
       }
     }
@@ -22399,7 +22400,7 @@ async function getPostCaproverCreateApp({
       }
     });
     if (registerApp === STATUS.OKAY) {
-      core3.info(`Caprover: successfully registered name: '${appName}'`);
+      core3.info(`Caprover: '${appName}' successfully registered.`);
       return appName;
     }
   } catch (error2) {
@@ -22409,20 +22410,20 @@ async function getPostCaproverCreateApp({
   }
   return;
 }
-async function getEnableAndReturnAppToken({
+async function getPostEnableAndReturnAppToken({
   appName
 }) {
   try {
-    core3.info(`Caprover: prefetching to check for existing appToken`);
+    core3.info(`Caprover: prefetching to check for existing appToken.`);
     const prefetchAllApps = await getAllApps();
     if (typeof prefetchAllApps === "object") {
       const appToken = prefetchAllApps?.appDefinitions.find((apps) => apps.appName === appName);
       if (appToken?.appDeployTokenConfig?.enabled) {
-        core3.info(`Caprover: app token already enabled for '${appName}'`);
+        core3.info(`Caprover: '${appName}' token already enabled.`);
         return appToken?.appDeployTokenConfig?.appDeployToken;
       }
     }
-    core3.info(`Caprover: enabling appToken for '${appName}'`);
+    core3.info(`Caprover: '${appName}'...enabling token.`);
     const updateToEnableAppToken = await caproverFetch({
       method: "POST",
       endpoint: "/user/apps/appDefinitions/update",
@@ -22434,7 +22435,7 @@ async function getEnableAndReturnAppToken({
       }
     });
     if (updateToEnableAppToken === STATUS.OKAY) {
-      core3.info(`Caprover: enabled appToken for '${appName}'\nFetching the newly created appToken...`);
+      core3.info(`Caprover: '${appName}'...enabled appToken.\nFetching the newly created appToken...`);
       const allApps = await getAllApps();
       if (typeof allApps === "object") {
         const appToken = allApps?.appDefinitions.find((apps) => apps.appName === appName);
@@ -22443,13 +22444,32 @@ async function getEnableAndReturnAppToken({
         }
       }
     }
-    core3.setFailed(`Caprover: unable to create app token for '${appName}'`);
+    core3.setFailed(`Caprover: '${appName}' unable to create app token.`);
     return;
   } catch (error2) {
     if (STATUS[error2.captainError]) {
       core3.setFailed(`Caprover: failed with error code: ${error2.captainError}`);
     }
   }
+}
+async function getPostEnableInstance({ appName }) {
+  return appName && caproverFetch({
+    method: "POST",
+    endpoint: "/user/apps/appDefinitions/update",
+    body: {
+      appName,
+      instanceCount: 1
+    }
+  });
+}
+async function getPostEnableSsl({ appName }) {
+  return appName && caproverFetch({
+    method: "POST",
+    endpoint: "/user/apps/appDefinitions/enablebasedomainssl",
+    body: {
+      appName
+    }
+  });
 }
 async function caproverDeploy({
   isDetached = true,
@@ -22458,18 +22478,11 @@ async function caproverDeploy({
   const appName = getInputAppName;
   const imageName = getInputImageUrl;
   if (!imageName) {
-    core3.setFailed(`Caprover: you must provide a '${INPUT_IMAGE_URL}'`);
+    core3.setFailed(`Caprover: no '${INPUT_IMAGE_URL}' provided.`);
   }
   try {
-    const enableInstance = await caproverFetch({
-      method: "POST",
-      endpoint: "/user/apps/appDefinitions/update",
-      body: {
-        appName,
-        instanceCount: 1
-      }
-    });
-    if (enableInstance === STATUS.OKAY) {
+    const preDeploySteps = await Promise.all([getPostEnableInstance, getPostEnableSsl].map((promiseFn) => promiseFn({ appName })));
+    if (preDeploySteps[0] === STATUS.OKAY && preDeploySteps[1] === STATUS.OKAY) {
       const startDeploy = await caproverFetch({
         method: "POST",
         endpoint: "/user/apps/appData/" + appName + (isDetached ? "?detached=1" : ""),
@@ -22485,7 +22498,7 @@ async function caproverDeploy({
         return startDeploy;
       }
     }
-    core3.info(`${enableInstance}`);
+    core3.info(`${preDeploySteps}`);
   } catch (error2) {
     if (STATUS[error2.captainError]) {
       core3.error(`${error2}`);
@@ -22496,7 +22509,7 @@ async function caproverDeploy({
 async function caproverFetch(config) {
   const url = getInputUrl;
   if (!url) {
-    core3.setFailed(`Caprover: '${INPUT_URL}' input needed`);
+    core3.setFailed(`Caprover: '${INPUT_URL}' needed.`);
     return;
   }
   if (!getInputPassword && config.endpoint === "/login" || !getInputAuthToken && config.endpoint !== "/login") {
@@ -22532,8 +22545,15 @@ async function caproverFetch(config) {
 }
 
 // /Users/verydanny/source/elysia-backend/.github/actions/scripts/src/caprover-deploy-image.ts
+var getEnvForDeployment = function(env) {
+  return Object.keys(env).reduce((envArray, currentEnv) => {
+    const matchEnv = currentEnv.match(CAP_ENV_REGEX);
+    core4.info(`${matchEnv}`);
+  }, []);
+};
 async function run() {
   const gitHash = github2.context.sha;
+  const getAllEnv = getEnvForDeployment(process.env);
   try {
     const deployImage = await caproverDeploy({ gitHash });
     core4.info(`${deployImage}`);

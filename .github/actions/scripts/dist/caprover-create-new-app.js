@@ -21724,6 +21724,7 @@ var core = __toESM(require_core(), 1);
 var emptyStringToUndefined = function(str) {
   return str === "" ? undefined : str;
 };
+var CAP_ENV_REGEX = /^cap_/gi;
 var TOKEN_HEADER = "x-captain-auth";
 var APP_TOKEN_HEADER = "x-captain-app-token";
 var NAMESPACE = "x-namespace";
@@ -22318,7 +22319,7 @@ async function getPostCaproverLogin() {
   const password = getInputPassword;
   const otpToken = Number(getInputOtpToken);
   if (!password) {
-    core2.setFailed(`Caprover: '${INPUT_PASSWORD}' input needed for login`);
+    core2.setFailed(`Caprover: '${INPUT_PASSWORD}' input needed for login.`);
     return;
   }
   try {
@@ -22356,7 +22357,7 @@ async function getPostCaproverCreateApp({
     if (typeof allApps === "object") {
       const appExists = allApps?.appDefinitions.find((app) => app.appName === appName);
       if (appExists?.appName) {
-        core2.info(`Caprover: '${appName}' app name exists...deploying new version`);
+        core2.info(`Caprover: '${appName}' app name exists...deploying new version.`);
         return appName;
       }
     }
@@ -22369,7 +22370,7 @@ async function getPostCaproverCreateApp({
       }
     });
     if (registerApp === STATUS.OKAY) {
-      core2.info(`Caprover: successfully registered name: '${appName}'`);
+      core2.info(`Caprover: '${appName}' successfully registered.`);
       return appName;
     }
   } catch (error2) {
@@ -22379,20 +22380,20 @@ async function getPostCaproverCreateApp({
   }
   return;
 }
-async function getEnableAndReturnAppToken({
+async function getPostEnableAndReturnAppToken({
   appName
 }) {
   try {
-    core2.info(`Caprover: prefetching to check for existing appToken`);
+    core2.info(`Caprover: prefetching to check for existing appToken.`);
     const prefetchAllApps = await getAllApps();
     if (typeof prefetchAllApps === "object") {
       const appToken = prefetchAllApps?.appDefinitions.find((apps) => apps.appName === appName);
       if (appToken?.appDeployTokenConfig?.enabled) {
-        core2.info(`Caprover: app token already enabled for '${appName}'`);
+        core2.info(`Caprover: '${appName}' token already enabled.`);
         return appToken?.appDeployTokenConfig?.appDeployToken;
       }
     }
-    core2.info(`Caprover: enabling appToken for '${appName}'`);
+    core2.info(`Caprover: '${appName}'...enabling token.`);
     const updateToEnableAppToken = await caproverFetch({
       method: "POST",
       endpoint: "/user/apps/appDefinitions/update",
@@ -22404,7 +22405,7 @@ async function getEnableAndReturnAppToken({
       }
     });
     if (updateToEnableAppToken === STATUS.OKAY) {
-      core2.info(`Caprover: enabled appToken for '${appName}'\nFetching the newly created appToken...`);
+      core2.info(`Caprover: '${appName}'...enabled appToken.\nFetching the newly created appToken...`);
       const allApps = await getAllApps();
       if (typeof allApps === "object") {
         const appToken = allApps?.appDefinitions.find((apps) => apps.appName === appName);
@@ -22413,13 +22414,32 @@ async function getEnableAndReturnAppToken({
         }
       }
     }
-    core2.setFailed(`Caprover: unable to create app token for '${appName}'`);
+    core2.setFailed(`Caprover: '${appName}' unable to create app token.`);
     return;
   } catch (error2) {
     if (STATUS[error2.captainError]) {
       core2.setFailed(`Caprover: failed with error code: ${error2.captainError}`);
     }
   }
+}
+async function getPostEnableInstance({ appName }) {
+  return appName && caproverFetch({
+    method: "POST",
+    endpoint: "/user/apps/appDefinitions/update",
+    body: {
+      appName,
+      instanceCount: 1
+    }
+  });
+}
+async function getPostEnableSsl({ appName }) {
+  return appName && caproverFetch({
+    method: "POST",
+    endpoint: "/user/apps/appDefinitions/enablebasedomainssl",
+    body: {
+      appName
+    }
+  });
 }
 async function caproverDeploy({
   isDetached = true,
@@ -22428,18 +22448,11 @@ async function caproverDeploy({
   const appName = getInputAppName;
   const imageName = getInputImageUrl;
   if (!imageName) {
-    core2.setFailed(`Caprover: you must provide a '${INPUT_IMAGE_URL}'`);
+    core2.setFailed(`Caprover: no '${INPUT_IMAGE_URL}' provided.`);
   }
   try {
-    const enableInstance = await caproverFetch({
-      method: "POST",
-      endpoint: "/user/apps/appDefinitions/update",
-      body: {
-        appName,
-        instanceCount: 1
-      }
-    });
-    if (enableInstance === STATUS.OKAY) {
+    const preDeploySteps = await Promise.all([getPostEnableInstance, getPostEnableSsl].map((promiseFn) => promiseFn({ appName })));
+    if (preDeploySteps[0] === STATUS.OKAY && preDeploySteps[1] === STATUS.OKAY) {
       const startDeploy = await caproverFetch({
         method: "POST",
         endpoint: "/user/apps/appData/" + appName + (isDetached ? "?detached=1" : ""),
@@ -22455,7 +22468,7 @@ async function caproverDeploy({
         return startDeploy;
       }
     }
-    core2.info(`${enableInstance}`);
+    core2.info(`${preDeploySteps}`);
   } catch (error2) {
     if (STATUS[error2.captainError]) {
       core2.error(`${error2}`);
@@ -22466,7 +22479,7 @@ async function caproverDeploy({
 async function caproverFetch(config) {
   const url = getInputUrl;
   if (!url) {
-    core2.setFailed(`Caprover: '${INPUT_URL}' input needed`);
+    core2.setFailed(`Caprover: '${INPUT_URL}' needed.`);
     return;
   }
   if (!getInputPassword && config.endpoint === "/login" || !getInputAuthToken && config.endpoint !== "/login") {
@@ -22519,10 +22532,13 @@ async function run() {
       appName
     });
     if (getCaproverRegisteredName) {
-      core3.info(`Caprover: setting output '${getCaproverRegisteredName}'`);
+      core3.info(`Caprover: '${OUTPUT_APP_NAME}' set.`);
+      core3.setSecret(getCaproverRegisteredName);
       core3.setOutput(OUTPUT_APP_NAME, getCaproverRegisteredName);
-      const appToken = await getEnableAndReturnAppToken({ appName });
+      const appToken = await getPostEnableAndReturnAppToken({ appName });
       if (appToken) {
+        core3.info(`Caprover: '${OUTPUT_APP_TOKEN}' set.`);
+        core3.setSecret(appToken);
         core3.setOutput(OUTPUT_APP_TOKEN, appToken);
       }
     }

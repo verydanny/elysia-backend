@@ -4,6 +4,8 @@ function emptyStringToUndefined(str: string) {
   return str === '' ? undefined : str
 }
 
+export const CAP_ENV_REGEX = /^cap_/gi
+
 export const TOKEN_HEADER = 'x-captain-auth'
 export const APP_TOKEN_HEADER = 'x-captain-app-token'
 export const NAMESPACE = 'x-namespace'
