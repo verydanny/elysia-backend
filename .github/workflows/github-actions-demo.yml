@@ -55,6 +55,7 @@ jobs:
         uses: verydanny/actions-otp@v1.0.5
         with:
           otp-url: ${{ secrets.CAPROVER_SECRET }}
+          otp-window: 5
 
       - 
         name: Log into Caprover
