@@ -5,26 +5,31 @@
     "test": "bun test",
     "dev": "bun run --watch src/index.tsx",
     "prod": "NODE_ENV=production bun src/index.ts",
-    "migrate": "ley"
+    "migrate": "ley",
+    "build:actions": "bun ./.github/actions/scripts/build.ts"
   },
   "dependencies": {
-    "@elysiajs/cors": "^0.7.2",
-    "@elysiajs/html": "latest",
-    "elysia": "latest",
-    "postgres": "latest",
-    "lucia": "^2.7.5",
-    "@lucia-auth/adapter-postgresql": "^2.0.2"
+    "@elysiajs/cors": "^0.8.0",
+    "@elysiajs/html": "^0.8.0",
+    "@lucia-auth/adapter-postgresql": "^2.0.2",
+    "@supabase/supabase-js": "^2.39.2",
+    "elysia": "^0.8.8",
+    "lucia": "^2.7.6",
+    "postgres": "^3.4.3"
   },
   "devDependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/github": "^6.0.0",
     "@eslint/js": "^8.56.0",
-    "@typescript-eslint/eslint-plugin": "^6.15.0",
-    "@typescript-eslint/parser": "^6.15.0",
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
+    "@typescript-eslint/parser": "^6.16.0",
+    "bun-types": "^1.0.20",
     "eslint": "^8.56.0",
-    "eslint-plugin-prettier": "^5.1.0",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.2",
+    "ley": "^0.8.1",
     "prettier": "^3.1.1",
-    "ley": "latest",
-    "bun-types": "latest",
+    "rambda": "^8.6.0",
     "tslib": "^2.6.2",
     "typescript": "^5.3.3"
   },

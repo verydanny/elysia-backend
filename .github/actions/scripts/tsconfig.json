@@ -1,0 +1,13 @@
+{
+  "extends": "../../../config/typescript/tsconfig.bun.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": ".",
+    "outDir": "actions/scripts/dist",
+    "emitDeclarationOnly": false
+  },
+  "include": [
+    "./src/**/*.ts",
+    "./build.ts"
+  ]
+}

@@ -1,15 +1,10 @@
 import { Elysia } from 'elysia'
-import { cors } from '@elysiajs/cors'
+// import { cors } from '@elysiajs/cors'
+// import { html } from '@elysiajs/html'
 import { user } from './controller/user.js'
-import { html } from '@elysiajs/html'
 
 const app = new Elysia()
-  .use(cors())
-  .use(html())
-  .get('/', () => {
-    return `<h1>Home Page</h1>`
-  })
-  .use(user)
+  .group('/api', (app) => app.use(user))
   .listen(Bun.env.PORT || 3000)
 
 export type App = typeof app

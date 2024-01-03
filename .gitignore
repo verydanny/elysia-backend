@@ -3,5 +3,7 @@ node_modules
 /.pnp
 .pnp.js
 
+.env.local
+
 # docker volumes
 dbdata

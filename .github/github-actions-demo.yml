@@ -1,0 +1,91 @@
+name: Preview Environment
+run-name: ${{ github.actor }} is testing out Github Actions 🚀
+on: [push]
+jobs:
+  # build-docker:
+  #   name: Build image and push to repository
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - 
+  #       name: Check out repository code
+  #       uses: actions/checkout@v4
+
+  #     -
+  #       name: Set up Docker buildx
+  #       uses: docker/setup-buildx-action@v3
+
+  #     -
+  #       name: Login to Docker Hub
+  #       uses: docker/login-action@v3
+  #       with:
+  #         username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+  #         password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
+      
+  #     -
+  #       name: Build and push
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: .
+  #         push: true
+  #         tags: ${{ github.repository }}:latest
+
+  deploy:
+    name: Deploy
+    # needs: ['build-docker']
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Check out repository code
+        uses: actions/checkout@v4
+
+      # -
+      #   name: Setup and Install Latest Bun
+      #   uses: oven-sh/setup-bun@v1
+      #   with:
+      #     bun-version: latest
+
+      # -
+      #   name: Install Caprover CLI
+      #   run: |
+      #     bun add caprover
+
+      - 
+        name: Use custom OTP Action
+        id: otp
+        uses: verydanny/actions-otp@v1.0.5
+        with:
+          otp-url: ${{ secrets.CAPROVER_SECRET }}
+          otp-window: 0
+
+      - 
+        name: Log into Caprover
+        id: caprover-login
+        uses: ./.github/actions/caprover-login
+        with:
+          caprover-url: ${{ secrets.CAPROVER_URL }}
+          caprover-password: ${{ secrets.CAPROVER_PASSWORD }}
+          caprover-otp: ${{ steps.otp.outputs.otp-token }}
+
+      - 
+        name: Create new Caprover App
+        id: caprover-create-new-app
+        uses: ./.github/actions/caprover-create-new-app
+        with:
+          caprover-auth-token: ${{ steps.caprover-login.outputs.caprover-auth-token }}
+          caprover-url: ${{ secrets.CAPROVER_URL }}
+
+      -
+        name: Deploy Caprover App
+        id: caprover-deploy
+        env:
+          CAP_PORT: "80"
+          CAP_SOME_OTHER_VARIABLE: "DINGUS"
+        uses: ./.github/actions/caprover-deploy-image
+        with:
+          caprover-url: ${{ secrets.CAPROVER_URL }}
+          caprover-auth-token: ${{ steps.caprover-login.outputs.caprover-auth-token }}
+          caprover-app-name: ${{ steps.caprover-create-new-app.outputs.caprover-app-name }}
+          caprover-app-token: ${{ steps.caprover-create-new-app.outputs.caprover-app-token }}
+          caprover-image-url: docker.io/${{ github.repository }}:latest
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+

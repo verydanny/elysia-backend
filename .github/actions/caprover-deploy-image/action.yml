@@ -1,0 +1,27 @@
+name: 'Caprover: Deploy Image'
+description: 'Deploy image from logged-in Caprover instance'
+inputs:
+  caprover-url:
+    description: The URL of the Caprover instance
+    required: true
+  caprover-auth-token:
+    description: Existing Caprover auth token
+    required: true
+  caprover-app-name:
+    description: Existing Caprover app
+    required: true
+  caprover-app-token:
+    description: Existing Caprover app token
+    required: true
+  caprover-image-url:
+    description: |
+      Link to Docker image to deploy, make sure caprover instance is
+      logged in if it's a private docker repo
+    required: true
+  github-token:
+    description: Github secret for the Workflow Deployment
+    required: true
+
+runs:
+  using: 'node20'
+  main: '../scripts/dist/caprover-deploy-image.js'

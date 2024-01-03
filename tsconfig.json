@@ -4,7 +4,13 @@
     "rootDir": ".",
     "baseUrl": ".",
     "outDir": "dist",
-    "composite": true,
+    "composite": true
   },
-  "include": ["src", "lucia.ts", "Lucia.d.ts"]
+  "include": [
+    ".github/actions/scripts/src/**/*",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "lucia.ts",
+    "Lucia.d.ts"
+  ]
 }

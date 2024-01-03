@@ -1,0 +1,22 @@
+name: 'Caprover: Create New App'
+description: 'Log into Caprover and return authentication token'
+inputs:
+  caprover-auth-token:
+    description: Auth-token to log into Caprover instances
+    required: true
+  caprover-url:
+    description: The URL of the Caprover instance
+    required: true
+  caprover-app-name:
+    description: |
+      The new Caprover app to be registered, otherwise generates one
+      from github.ref and github.sha
+    required: false
+outputs:
+  caprover-app-name:
+    description: The app name that Caprover created
+  caprover-app-token:
+    description: The app token for freshly created app
+runs:
+  using: 'node20'
+  main: '../scripts/dist/caprover-create-new-app.js'
