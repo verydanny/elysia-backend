@@ -33,7 +33,7 @@ export async function run() {
   const gitHash = github.context.sha
   const envVars = getEnvForDeployment(process.env)
 
-  core.info(`env: ${envVars}`)
+  core.info(`env: ${JSON.stringify(envVars)}`)
   try {
     const deployImage = await caproverDeploy({ gitHash, envVars })
 

@@ -78,7 +78,7 @@ jobs:
         name: Deploy Caprover App
         id: caprover-deploy
         env:
-          CAP_SOME_VARIABLE: "TESTING"
+          CAP_PORT: "80"
           CAP_SOME_OTHER_VARIABLE: "DINGUS"
         uses: ./.github/actions/caprover-deploy-image
         with:
