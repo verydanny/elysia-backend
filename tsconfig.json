@@ -8,7 +8,8 @@
   },
   "include": [
     ".github/actions/scripts/src/**/*",
-    "src",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     "lucia.ts",
     "Lucia.d.ts"
   ]

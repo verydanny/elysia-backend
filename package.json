@@ -11,7 +11,7 @@
   "dependencies": {
     "@elysiajs/cors": "^0.8.0",
     "@elysiajs/html": "^0.8.0",
-    "elysia": "^0.8.5",
+    "elysia": "^0.8.8",
     "postgres": "^3.4.3",
     "lucia": "^2.7.6",
     "@lucia-auth/adapter-postgresql": "^2.0.2"
