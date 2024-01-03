@@ -325,11 +325,11 @@ export async function caproverFetch(config: CaproverFetch) {
     return
   }
 
-  if (
-    (!getInputPassword && config.endpoint === '/login') ||
-    (!getInputAuthToken && config.endpoint !== '/login') ||
-    (!getInputAppToken && config.endpoint !== '/login')
-  ) {
+  const noPassOnLogin = !getInputPassword && config.endpoint === '/login'
+  const noAuthOnRoutes = !getInputAuthToken && config.endpoint !== '/login'
+  const noAppTokenOnRoutes = !getInputAppToken && config.endpoint !== '/login'
+
+  if (noPassOnLogin || (noAuthOnRoutes && noAppTokenOnRoutes)) {
     core.setFailed(
       `Caprover: you must provide a '${INPUT_AUTH_TOKEN}' or '${INPUT_PASSWORD}'`
     )
