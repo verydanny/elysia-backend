@@ -22459,25 +22459,32 @@ async function getPostEnableInstance({
 }) {
   const getApp = await getAppDefinition({ appName });
   if (getApp?.appName) {
-    return caproverFetch({
-      method: "POST",
-      endpoint: "/user/apps/appDefinitions/update",
-      body: {
-        appName,
-        notExposeAsWebApp: getApp?.notExposeAsWebApp,
-        forceSsl: getApp?.forceSsl,
-        volumes: getApp?.volumes,
-        ports: getApp?.ports,
-        customNginxConfig: getApp?.customNginxConfig,
-        appPushWebhook: getApp?.appPushWebhook,
-        nodeId: getApp?.nodeId,
-        preDeployFunction: getApp?.preDeployFunction,
-        envVars: getApp?.envVars,
-        appDeployTokenConfig: getApp?.appDeployTokenConfig,
-        ...getApp?.instanceCount == 0 ? { instanceCount: 1 } : {},
-        ...Array.isArray(envVars) && envVars.length > 0 ? { envVars } : {}
+    try {
+      return caproverFetch({
+        method: "POST",
+        endpoint: "/user/apps/appDefinitions/update",
+        body: {
+          appName,
+          notExposeAsWebApp: getApp?.notExposeAsWebApp,
+          forceSsl: getApp?.forceSsl,
+          volumes: getApp?.volumes,
+          ports: getApp?.ports,
+          customNginxConfig: getApp?.customNginxConfig,
+          appPushWebhook: getApp?.appPushWebhook,
+          nodeId: getApp?.nodeId,
+          preDeployFunction: getApp?.preDeployFunction,
+          envVars: getApp?.envVars,
+          appDeployTokenConfig: getApp?.appDeployTokenConfig,
+          ...getApp?.instanceCount == 0 ? { instanceCount: 1 } : {},
+          ...Array.isArray(envVars) && envVars.length > 0 ? { envVars } : {}
+        }
+      });
+    } catch (error2) {
+      core2.info(`Failed: getPostEnableInstance ${error2}`);
+      if (STATUS[error2.captainError]) {
+        core2.setFailed(`Caprover: failed with error code: ${error2.captainError}`);
       }
-    });
+    }
   }
 }
 async function caproverDeploy({

@@ -281,25 +281,37 @@ export async function getPostEnableInstance({
   const getApp = await getAppDefinition({ appName })
 
   if (getApp?.appName) {
-    return caproverFetch({
-      method: 'POST',
-      endpoint: '/user/apps/appDefinitions/update',
-      body: {
-        appName,
-        notExposeAsWebApp: getApp?.notExposeAsWebApp,
-        forceSsl: getApp?.forceSsl,
-        volumes: getApp?.volumes,
-        ports: getApp?.ports,
-        customNginxConfig: getApp?.customNginxConfig,
-        appPushWebhook: getApp?.appPushWebhook,
-        nodeId: getApp?.nodeId,
-        preDeployFunction: getApp?.preDeployFunction,
-        envVars: getApp?.envVars,
-        appDeployTokenConfig: getApp?.appDeployTokenConfig,
-        ...(getApp?.instanceCount == 0 ? { instanceCount: 1 } : {}),
-        ...(Array.isArray(envVars) && envVars.length > 0 ? { envVars } : {}),
-      },
-    })
+    try {
+      return caproverFetch({
+        method: 'POST',
+        endpoint: '/user/apps/appDefinitions/update',
+        body: {
+          appName,
+          notExposeAsWebApp: getApp?.notExposeAsWebApp,
+          forceSsl: getApp?.forceSsl,
+          volumes: getApp?.volumes,
+          ports: getApp?.ports,
+          customNginxConfig: getApp?.customNginxConfig,
+          appPushWebhook: getApp?.appPushWebhook,
+          nodeId: getApp?.nodeId,
+          preDeployFunction: getApp?.preDeployFunction,
+          envVars: getApp?.envVars,
+          appDeployTokenConfig: getApp?.appDeployTokenConfig,
+          ...(getApp?.instanceCount == 0 ? { instanceCount: 1 } : {}),
+          ...(Array.isArray(envVars) && envVars.length > 0 ? { envVars } : {}),
+        },
+      })
+    } catch (error) {
+      core.info(`Failed: getPostEnableInstance ${error}`)
+
+      if (STATUS[(error as CaptainError).captainError]) {
+        core.setFailed(
+          `Caprover: failed with error code: ${
+            (error as CaptainError).captainError
+          }`
+        )
+      }
+    }
   }
 }
 
