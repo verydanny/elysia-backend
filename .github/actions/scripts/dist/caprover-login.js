@@ -18494,7 +18494,10 @@ async function getPostCaproverLogin() {
         ...otpToken && !isNaN(otpToken) ? { otpToken } : {}
       }
     });
-    core2.info(`Login result ${loginResult}`);
+    core2.info(`Login result, body: ${{
+      password,
+      ...otpToken && !isNaN(otpToken) ? { otpToken } : {}
+    }}`);
     if (loginResult && typeof loginResult === "object") {
       return loginResult.token;
     }

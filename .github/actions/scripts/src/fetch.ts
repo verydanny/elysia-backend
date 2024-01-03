@@ -90,7 +90,12 @@ export async function getPostCaproverLogin(): Promise<string | undefined> {
       | STATUS.OKAY_BUILD_STARTED
       | undefined
 
-    core.info(`Login result ${loginResult}`)
+    core.info(
+      `Login result, body: ${{
+        password,
+        ...(otpToken && !isNaN(otpToken) ? { otpToken } : {}),
+      }}`
+    )
 
     if (loginResult && typeof loginResult === 'object') {
       return loginResult.token
