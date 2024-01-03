@@ -18,8 +18,13 @@ import {
   getInputAppToken,
   getInputImageUrl,
   INPUT_IMAGE_URL,
+  INPUT_APP_NAME,
 } from './constants.js'
-import { GetPostCaproverLogin, type GetAllAppsJson } from './fetchTypes.js'
+import {
+  GetPostCaproverLogin,
+  type GetAllAppsJson,
+  AppDefinition,
+} from './fetchTypes.js'
 import { isEmpty } from 'rambda'
 import { EnvVar } from './caprover-deploy-image.js'
 
@@ -42,11 +47,13 @@ interface CaproverBodyJSON {
   envVars?: EnvVar[]
 }
 
+type DefinitionBody = Partial<AppDefinition>
+
 interface CaproverFetch {
   url?: string
   endpoint: string
   method: 'GET' | 'POST' | 'POST_DATA'
-  body?: CaproverBodyJSON
+  body?: CaproverBodyJSON & DefinitionBody
 }
 
 function createHeaders() {
@@ -122,11 +129,9 @@ export async function getAllApps(): Promise<
   >
 }
 
-export async function getPostCaproverCreateApp({
+export async function getAppDefinition({
   appName,
-  hasPersistentData = false,
-}: Required<Pick<CaproverBodyJSON, 'appName'>> &
-  Pick<CaproverBodyJSON, 'hasPersistentData'>): Promise<string | undefined> {
+}: Required<Pick<CaproverBodyJSON, 'appName'>>) {
   try {
     const allApps = await getAllApps()
 
@@ -140,8 +145,30 @@ export async function getPostCaproverCreateApp({
           `Caprover: '${appName}' app name exists...deploying new version.`
         )
 
-        return appName
+        return appExists
       }
+    }
+  } catch (error) {
+    if (STATUS[(error as CaptainError).captainError]) {
+      core.setFailed(
+        `Caprover: failed with error code: ${
+          (error as CaptainError).captainError
+        }`
+      )
+    }
+  }
+}
+
+export async function getPostCaproverCreateApp({
+  appName,
+  hasPersistentData = false,
+}: Required<Pick<CaproverBodyJSON, 'appName'>> &
+  Pick<CaproverBodyJSON, 'hasPersistentData'>): Promise<string | undefined> {
+  try {
+    const getApp = await getAppDefinition({ appName })
+
+    if (getApp?.appName) {
+      return getApp.appName
     }
 
     const registerApp = await caproverFetch({
@@ -189,20 +216,10 @@ export async function getPostEnableAndReturnAppToken({
   try {
     core.info(`Caprover: prefetching to check for existing appToken.`)
 
-    const prefetchAllApps = await getAllApps()
+    const getApp = await getAppDefinition({ appName })
 
-    if (typeof prefetchAllApps === 'object') {
-      const preFetchAppToken = prefetchAllApps?.appDefinitions.find(
-        (apps) => apps.appName === appName
-      )
-
-      core.info(`Caprover: Prefetched app: ${JSON.stringify(preFetchAppToken)}`)
-
-      if (preFetchAppToken?.appDeployTokenConfig?.enabled) {
-        core.info(`Caprover: '${appName}' token already enabled.`)
-
-        return preFetchAppToken?.appDeployTokenConfig?.appDeployToken
-      }
+    if (getApp?.appDeployTokenConfig?.enabled) {
+      return getApp.appDeployTokenConfig.appDeployToken
     }
 
     core.info(`Caprover: '${appName}'...enabling token.`)
@@ -215,6 +232,16 @@ export async function getPostEnableAndReturnAppToken({
         appDeployTokenConfig: {
           enabled: true,
         },
+        instanceCount: getApp?.instanceCount,
+        notExposeAsWebApp: getApp?.notExposeAsWebApp,
+        forceSsl: getApp?.forceSsl,
+        volumes: getApp?.volumes,
+        ports: getApp?.ports,
+        customNginxConfig: getApp?.customNginxConfig,
+        appPushWebhook: getApp?.appPushWebhook,
+        nodeId: getApp?.nodeId,
+        preDeployFunction: getApp?.preDeployFunction,
+        envVars: getApp?.envVars,
       },
     })
 
@@ -223,16 +250,10 @@ export async function getPostEnableAndReturnAppToken({
         `Caprover: '${appName}'...enabled appToken.\nFetching the newly created appToken...`
       )
 
-      const allApps = await getAllApps()
+      const getApp = await getAppDefinition({ appName })
 
-      if (typeof allApps === 'object') {
-        const appToken = allApps?.appDefinitions.find(
-          (apps) => apps.appName === appName
-        )
-
-        if (appToken?.appDeployTokenConfig?.enabled) {
-          return appToken?.appDeployTokenConfig?.appDeployToken
-        }
+      if (getApp?.appDeployTokenConfig?.enabled) {
+        return getApp.appDeployTokenConfig.appDeployToken
       }
     }
 
@@ -254,21 +275,32 @@ export async function getPostEnableInstance({
   appName,
   envVars,
 }: {
-  appName?: string
+  appName: string
   envVars?: EnvVar[]
 }) {
-  return (
-    appName &&
-    caproverFetch({
+  const getApp = await getAppDefinition({ appName })
+
+  if (getApp?.appName) {
+    return caproverFetch({
       method: 'POST',
       endpoint: '/user/apps/appDefinitions/update',
       body: {
         appName,
-        instanceCount: 1,
+        notExposeAsWebApp: getApp?.notExposeAsWebApp,
+        forceSsl: getApp?.forceSsl,
+        volumes: getApp?.volumes,
+        ports: getApp?.ports,
+        customNginxConfig: getApp?.customNginxConfig,
+        appPushWebhook: getApp?.appPushWebhook,
+        nodeId: getApp?.nodeId,
+        preDeployFunction: getApp?.preDeployFunction,
+        envVars: getApp?.envVars,
+        appDeployTokenConfig: getApp?.appDeployTokenConfig,
+        instanceCount: getApp?.instanceCount || 1,
         ...(Array.isArray(envVars) && envVars.length > 0 ? { envVars } : {}),
       },
     })
-  )
+  }
 }
 
 export async function getPostEnableSsl({ appName }: { appName?: string }) {
@@ -298,6 +330,14 @@ export async function caproverDeploy({
 
   if (!imageName) {
     core.setFailed(`Caprover: no '${INPUT_IMAGE_URL}' provided.`)
+
+    return
+  }
+
+  if (!appName) {
+    core.setFailed(`Caprover: no '${INPUT_APP_NAME}' provided.`)
+
+    return
   }
 
   try {
