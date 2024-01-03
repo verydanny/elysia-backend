@@ -22534,7 +22534,6 @@ async function run() {
     });
     if (getCaproverRegisteredName) {
       core3.info(`Caprover: '${OUTPUT_APP_NAME}' set.`);
-      core3.setSecret(getCaproverRegisteredName);
       core3.setOutput(OUTPUT_APP_NAME, getCaproverRegisteredName);
       const appToken = await getPostEnableAndReturnAppToken({ appName });
       if (appToken) {

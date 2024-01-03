@@ -41,7 +41,6 @@ export async function run() {
 
     if (getCaproverRegisteredName) {
       core.info(`Caprover: '${OUTPUT_APP_NAME}' set.`)
-      core.setSecret(getCaproverRegisteredName)
 
       core.setOutput(OUTPUT_APP_NAME, getCaproverRegisteredName)
 
