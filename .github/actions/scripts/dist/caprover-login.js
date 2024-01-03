@@ -18623,7 +18623,7 @@ async function getPostEnableInstance({
   const getApp = await getAppDefinition({ appName });
   if (getApp?.appName) {
     try {
-      return caproverFetch({
+      const createEnableInstance = await caproverFetch({
         method: "POST",
         endpoint: "/user/apps/appDefinitions/update",
         body: {
@@ -18642,6 +18642,7 @@ async function getPostEnableInstance({
           ...Array.isArray(envVars) && envVars.length > 0 ? { envVars } : {}
         }
       });
+      return createEnableInstance;
     } catch (error2) {
       core2.info(`Failed: getPostEnableInstance ${error2}`);
       if (STATUS[error2.captainError]) {
@@ -18724,8 +18725,10 @@ async function caproverFetch(config) {
     }
     return;
   } catch (error2) {
-    core2.error(`${error2}`);
-    core2.setFailed(`Caprover: failed to fetch`);
+    if (STATUS[error2.captainError]) {
+      core2.error(`${error2}`);
+      core2.setFailed(`Caprover: failed with error code: ${error2.captainError}`);
+    }
     return;
   }
 }

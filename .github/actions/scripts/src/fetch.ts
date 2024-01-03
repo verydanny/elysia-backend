@@ -282,7 +282,7 @@ export async function getPostEnableInstance({
 
   if (getApp?.appName) {
     try {
-      return caproverFetch({
+      const createEnableInstance = await caproverFetch({
         method: 'POST',
         endpoint: '/user/apps/appDefinitions/update',
         body: {
@@ -301,6 +301,8 @@ export async function getPostEnableInstance({
           ...(Array.isArray(envVars) && envVars.length > 0 ? { envVars } : {}),
         },
       })
+
+      return createEnableInstance
     } catch (error) {
       core.info(`Failed: getPostEnableInstance ${error}`)
 
@@ -440,9 +442,15 @@ export async function caproverFetch(config: CaproverFetch) {
 
     return
   } catch (error) {
-    core.error(`${error}`)
+    if (STATUS[(error as CaptainError).captainError]) {
+      core.error(`${error}`)
 
-    core.setFailed(`Caprover: failed to fetch`)
+      core.setFailed(
+        `Caprover: failed with error code: ${
+          (error as CaptainError).captainError
+        }`
+      )
+    }
 
     return
   }
