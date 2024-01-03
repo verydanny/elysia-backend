@@ -22400,10 +22400,11 @@ async function getPostEnableAndReturnAppToken({
     core2.info(`Caprover: prefetching to check for existing appToken.`);
     const prefetchAllApps = await getAllApps();
     if (typeof prefetchAllApps === "object") {
-      const appToken = prefetchAllApps?.appDefinitions.find((apps) => apps.appName === appName);
-      if (appToken?.appDeployTokenConfig?.enabled) {
+      const preFetchAppToken = prefetchAllApps?.appDefinitions.find((apps) => apps.appName === appName);
+      core2.info(`Caprover: Prefetched app: ${JSON.stringify(preFetchAppToken)}`);
+      if (preFetchAppToken?.appDeployTokenConfig?.enabled) {
         core2.info(`Caprover: '${appName}' token already enabled.`);
-        return appToken?.appDeployTokenConfig?.appDeployToken;
+        return preFetchAppToken?.appDeployTokenConfig?.appDeployToken;
       }
     }
     core2.info(`Caprover: '${appName}'...enabling token.`);

@@ -192,14 +192,16 @@ export async function getPostEnableAndReturnAppToken({
     const prefetchAllApps = await getAllApps()
 
     if (typeof prefetchAllApps === 'object') {
-      const appToken = prefetchAllApps?.appDefinitions.find(
+      const preFetchAppToken = prefetchAllApps?.appDefinitions.find(
         (apps) => apps.appName === appName
       )
 
-      if (appToken?.appDeployTokenConfig?.enabled) {
+      core.info(`Caprover: Prefetched app: ${JSON.stringify(preFetchAppToken)}`)
+
+      if (preFetchAppToken?.appDeployTokenConfig?.enabled) {
         core.info(`Caprover: '${appName}' token already enabled.`)
 
-        return appToken?.appDeployTokenConfig?.appDeployToken
+        return preFetchAppToken?.appDeployTokenConfig?.appDeployToken
       }
     }
 
