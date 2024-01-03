@@ -91,10 +91,10 @@ export async function getPostCaproverLogin(): Promise<string | undefined> {
       | undefined
 
     core.info(
-      `Login result, body: ${{
+      `Login result, body: ${JSON.stringify({
         password,
         ...(otpToken && !isNaN(otpToken) ? { otpToken } : {}),
-      }}`
+      })}`
     )
 
     if (loginResult && typeof loginResult === 'object') {

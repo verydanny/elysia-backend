@@ -22361,10 +22361,10 @@ async function getPostCaproverLogin() {
         ...otpToken && !isNaN(otpToken) ? { otpToken } : {}
       }
     });
-    core3.info(`Login result, body: ${{
+    core3.info(`Login result, body: ${JSON.stringify({
       password,
       ...otpToken && !isNaN(otpToken) ? { otpToken } : {}
-    }}`);
+    })}`);
     if (loginResult && typeof loginResult === "object") {
       return loginResult.token;
     }
