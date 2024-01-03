@@ -219,6 +219,8 @@ export async function getPostEnableAndReturnAppToken({
     const getApp = await getAppDefinition({ appName })
 
     if (getApp?.appDeployTokenConfig?.enabled) {
+      core.info(`Caprover: app token already enabled for '${appName}'`)
+
       return getApp.appDeployTokenConfig.appDeployToken
     }
 

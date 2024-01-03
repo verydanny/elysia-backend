@@ -22444,6 +22444,7 @@ async function getPostEnableAndReturnAppToken({
     core3.info(`Caprover: prefetching to check for existing appToken.`);
     const getApp = await getAppDefinition({ appName });
     if (getApp?.appDeployTokenConfig?.enabled) {
+      core3.info(`Caprover: app token already enabled for '${appName}'`);
       return getApp.appDeployTokenConfig.appDeployToken;
     }
     core3.info(`Caprover: '${appName}'...enabling token.`);
