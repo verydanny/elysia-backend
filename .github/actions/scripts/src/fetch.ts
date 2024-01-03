@@ -141,9 +141,7 @@ export async function getAppDefinition({
       )
 
       if (appExists?.appName) {
-        core.info(
-          `Caprover: '${appName}' app name exists...deploying new version.`
-        )
+        core.info(`Caprover: '${appName}' app exists`)
 
         return appExists
       }
@@ -298,7 +296,7 @@ export async function getPostEnableInstance({
         preDeployFunction: getApp?.preDeployFunction,
         envVars: getApp?.envVars,
         appDeployTokenConfig: getApp?.appDeployTokenConfig,
-        instanceCount: getApp?.instanceCount || 1,
+        ...(getApp?.instanceCount == 0 ? { instanceCount: 1 } : {}),
         ...(Array.isArray(envVars) && envVars.length > 0 ? { envVars } : {}),
       },
     })

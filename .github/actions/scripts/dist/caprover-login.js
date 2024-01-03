@@ -18522,7 +18522,7 @@ async function getAppDefinition({
     if (typeof allApps === "object") {
       const appExists = allApps?.appDefinitions.find((app) => app.appName === appName);
       if (appExists?.appName) {
-        core2.info(`Caprover: '${appName}' app name exists...deploying new version.`);
+        core2.info(`Caprover: '${appName}' app exists`);
         return appExists;
       }
     }
@@ -18637,7 +18637,7 @@ async function getPostEnableInstance({
         preDeployFunction: getApp?.preDeployFunction,
         envVars: getApp?.envVars,
         appDeployTokenConfig: getApp?.appDeployTokenConfig,
-        instanceCount: getApp?.instanceCount || 1,
+        ...getApp?.instanceCount == 0 ? { instanceCount: 1 } : {},
         ...Array.isArray(envVars) && envVars.length > 0 ? { envVars } : {}
       }
     });
