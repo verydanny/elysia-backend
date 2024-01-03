@@ -21724,7 +21724,7 @@ var core = __toESM(require_core(), 1);
 var emptyStringToUndefined = function(str) {
   return str === "" ? undefined : str;
 };
-var CAP_ENV_REGEX = /^cap_/gi;
+var CAP_ENV_REGEX = /^cap_(\w+)/i;
 var TOKEN_HEADER = "x-captain-auth";
 var APP_TOKEN_HEADER = "x-captain-app-token";
 var NAMESPACE = "x-namespace";
@@ -22371,6 +22371,16 @@ async function getPostCaproverCreateApp({
     });
     if (registerApp === STATUS.OKAY) {
       core2.info(`Caprover: '${appName}' successfully registered.`);
+      const enableBaseDomainSsl = await caproverFetch({
+        endpoint: "/user/apps/appDefinitions/enablebasedomainssl",
+        method: "POST",
+        body: {
+          appName
+        }
+      });
+      if (enableBaseDomainSsl === STATUS.OKAY) {
+        core2.info(`Caprover: general SSL is enabled for: '${appName}'`);
+      }
       return appName;
     }
   } catch (error2) {
@@ -22432,15 +22442,6 @@ async function getPostEnableInstance({ appName }) {
     }
   });
 }
-async function getPostEnableSsl({ appName }) {
-  return appName && caproverFetch({
-    method: "POST",
-    endpoint: "/user/apps/appDefinitions/enablebasedomainssl",
-    body: {
-      appName
-    }
-  });
-}
 async function caproverDeploy({
   isDetached = true,
   gitHash = ""
@@ -22451,7 +22452,7 @@ async function caproverDeploy({
     core2.setFailed(`Caprover: no '${INPUT_IMAGE_URL}' provided.`);
   }
   try {
-    const preDeploySteps = await Promise.all([getPostEnableInstance, getPostEnableSsl].map((promiseFn) => promiseFn({ appName })));
+    const preDeploySteps = await Promise.all([getPostEnableInstance].map((promiseFn) => promiseFn({ appName })));
     if (preDeploySteps[0] === STATUS.OKAY && preDeploySteps[1] === STATUS.OKAY) {
       const startDeploy = await caproverFetch({
         method: "POST",

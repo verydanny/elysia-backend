@@ -21728,7 +21728,7 @@ var core = __toESM(require_core(), 1);
 var emptyStringToUndefined = function(str) {
   return str === "" ? undefined : str;
 };
-var CAP_ENV_REGEX = /^cap_/gi;
+var CAP_ENV_REGEX = /^cap_(\w+)/i;
 var TOKEN_HEADER = "x-captain-auth";
 var APP_TOKEN_HEADER = "x-captain-app-token";
 var NAMESPACE = "x-namespace";
@@ -22401,6 +22401,16 @@ async function getPostCaproverCreateApp({
     });
     if (registerApp === STATUS.OKAY) {
       core3.info(`Caprover: '${appName}' successfully registered.`);
+      const enableBaseDomainSsl = await caproverFetch({
+        endpoint: "/user/apps/appDefinitions/enablebasedomainssl",
+        method: "POST",
+        body: {
+          appName
+        }
+      });
+      if (enableBaseDomainSsl === STATUS.OKAY) {
+        core3.info(`Caprover: general SSL is enabled for: '${appName}'`);
+      }
       return appName;
     }
   } catch (error2) {
@@ -22462,15 +22472,6 @@ async function getPostEnableInstance({ appName }) {
     }
   });
 }
-async function getPostEnableSsl({ appName }) {
-  return appName && caproverFetch({
-    method: "POST",
-    endpoint: "/user/apps/appDefinitions/enablebasedomainssl",
-    body: {
-      appName
-    }
-  });
-}
 async function caproverDeploy({
   isDetached = true,
   gitHash = ""
@@ -22481,7 +22482,7 @@ async function caproverDeploy({
     core3.setFailed(`Caprover: no '${INPUT_IMAGE_URL}' provided.`);
   }
   try {
-    const preDeploySteps = await Promise.all([getPostEnableInstance, getPostEnableSsl].map((promiseFn) => promiseFn({ appName })));
+    const preDeploySteps = await Promise.all([getPostEnableInstance].map((promiseFn) => promiseFn({ appName })));
     if (preDeploySteps[0] === STATUS.OKAY && preDeploySteps[1] === STATUS.OKAY) {
       const startDeploy = await caproverFetch({
         method: "POST",
@@ -22548,12 +22549,18 @@ async function caproverFetch(config) {
 var getEnvForDeployment = function(env) {
   return Object.keys(env).reduce((envArray, currentEnv) => {
     const matchEnv = currentEnv.match(CAP_ENV_REGEX);
-    core4.info(`${matchEnv}`);
+    const matchResult = Array.isArray(matchEnv) && matchEnv[1];
+    if (matchResult) {
+      const stringified = JSON.stringify({ [matchResult]: env[currentEnv] });
+      return [...envArray, stringified];
+    }
+    return envArray;
   }, []);
 };
 async function run() {
   const gitHash = github2.context.sha;
   const getAllEnv = getEnvForDeployment(process.env);
+  core4.info(`env: ${getAllEnv}`);
   try {
     const deployImage = await caproverDeploy({ gitHash });
     core4.info(`${deployImage}`);

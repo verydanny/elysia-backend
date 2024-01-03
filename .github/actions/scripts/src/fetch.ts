@@ -149,6 +149,18 @@ export async function getPostCaproverCreateApp({
     if (registerApp === STATUS.OKAY) {
       core.info(`Caprover: '${appName}' successfully registered.`)
 
+      const enableBaseDomainSsl = await caproverFetch({
+        endpoint: '/user/apps/appDefinitions/enablebasedomainssl',
+        method: 'POST',
+        body: {
+          appName,
+        },
+      })
+
+      if (enableBaseDomainSsl === STATUS.OKAY) {
+        core.info(`Caprover: general SSL is enabled for: '${appName}'`)
+      }
+
       return appName
     }
   } catch (error) {
@@ -272,9 +284,7 @@ export async function caproverDeploy({
 
   try {
     const preDeploySteps = await Promise.all(
-      [getPostEnableInstance, getPostEnableSsl].map((promiseFn) =>
-        promiseFn({ appName })
-      )
+      [getPostEnableInstance].map((promiseFn) => promiseFn({ appName }))
     )
 
     if (
