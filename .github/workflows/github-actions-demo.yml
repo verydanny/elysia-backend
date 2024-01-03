@@ -65,27 +65,27 @@ jobs:
           caprover-password: ${{ secrets.CAPROVER_PASSWORD }}
           caprover-otp: ${{ steps.otp.outputs.otp-token }}
 
-      - 
-        name: Create new Caprover App and Post URL
-        id: caprover-create-new-app
-        uses: ./.github/actions/caprover-create-new-app
-        with:
-          caprover-auth-token: ${{ steps.caprover-login.outputs.caprover-auth-token }}
-          caprover-url: ${{ secrets.CAPROVER_URL }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      # - 
+      #   name: Create new Caprover App and Post URL
+      #   id: caprover-create-new-app
+      #   uses: ./.github/actions/caprover-create-new-app
+      #   with:
+      #     caprover-auth-token: ${{ steps.caprover-login.outputs.caprover-auth-token }}
+      #     caprover-url: ${{ secrets.CAPROVER_URL }}
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      -
-        name: Deploy Caprover App
-        id: caprover-deploy
-        env:
-          CAP_SOME_VARIABLE: "TESTING"
-          CAP_SOME_OTHER_VARIABLE: "DINGUS"
-        uses: ./.github/actions/caprover-deploy-image
-        with:
-          caprover-auth-token: ${{ steps.caprover-login.outputs.caprover-auth-token }}
-          caprover-url: ${{ secrets.CAPROVER_URL }}
-          caprover-app-name: ${{ steps.caprover-create-new-app.outputs.caprover-app-name }}
-          caprover-app-token: ${{ steps.caprover-create-new-app.outputs.caprover-app-token }}
-          caprover-image-url: docker.io/${{ github.repository }}:latest
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      # -
+      #   name: Deploy Caprover App
+      #   id: caprover-deploy
+      #   env:
+      #     CAP_SOME_VARIABLE: "TESTING"
+      #     CAP_SOME_OTHER_VARIABLE: "DINGUS"
+      #   uses: ./.github/actions/caprover-deploy-image
+      #   with:
+      #     caprover-auth-token: ${{ steps.caprover-login.outputs.caprover-auth-token }}
+      #     caprover-url: ${{ secrets.CAPROVER_URL }}
+      #     caprover-app-name: ${{ steps.caprover-create-new-app.outputs.caprover-app-name }}
+      #     caprover-app-token: ${{ steps.caprover-create-new-app.outputs.caprover-app-token }}
+      #     caprover-image-url: docker.io/${{ github.repository }}:latest
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
 
