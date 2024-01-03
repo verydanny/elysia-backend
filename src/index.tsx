@@ -5,8 +5,8 @@ import { html } from '@elysiajs/html'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
-  'https://toojhcjwevocybrjnsag.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvb2poY2p3ZXZvY3licmpuc2FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDMwODcxOTgsImV4cCI6MjAxODY2MzE5OH0.5OUhLYCJgi3PSwvQwZCP6aIjGZgrCJeiPIv7SYTsLFo'
+  Bun.env.SUPABASE_URL as string,
+  Bun.env.SUPABASE_API as string
 )
 
 const app = new Elysia()
