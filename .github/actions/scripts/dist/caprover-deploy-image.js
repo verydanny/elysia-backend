@@ -22569,7 +22569,7 @@ var getEnvForDeployment = function(env) {
 async function run() {
   const gitHash = github2.context.sha;
   const envVars = getEnvForDeployment(process.env);
-  core4.info(`env: ${envVars}`);
+  core4.info(`env: ${JSON.stringify(envVars)}`);
   try {
     const deployImage = await caproverDeploy({ gitHash, envVars });
     core4.info(`${deployImage}`);

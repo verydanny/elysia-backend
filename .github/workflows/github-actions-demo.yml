@@ -67,13 +67,12 @@ jobs:
           caprover-otp: ${{ steps.otp.outputs.otp-token }}
 
       - 
-        name: Create new Caprover App and Post URL
+        name: Create new Caprover App
         id: caprover-create-new-app
         uses: ./.github/actions/caprover-create-new-app
         with:
           caprover-auth-token: ${{ steps.caprover-login.outputs.caprover-auth-token }}
           caprover-url: ${{ secrets.CAPROVER_URL }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       -
         name: Deploy Caprover App
