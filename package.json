@@ -11,10 +11,11 @@
   "dependencies": {
     "@elysiajs/cors": "^0.8.0",
     "@elysiajs/html": "^0.8.0",
+    "@lucia-auth/adapter-postgresql": "^2.0.2",
+    "@supabase/supabase-js": "^2.39.2",
     "elysia": "^0.8.8",
-    "postgres": "^3.4.3",
     "lucia": "^2.7.6",
-    "@lucia-auth/adapter-postgresql": "^2.0.2"
+    "postgres": "^3.4.3"
   },
   "devDependencies": {
     "@actions/core": "^1.10.1",
