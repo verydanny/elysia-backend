@@ -12,7 +12,10 @@ function getEnvForDeployment(
     const matchResult = Array.isArray(matchEnv) && matchEnv[1]
 
     if (matchResult) {
-      const stringified = JSON.stringify({ [matchResult]: env[currentEnv] })
+      const stringified = JSON.stringify({
+        key: [matchResult],
+        value: env[currentEnv],
+      })
 
       return [...envArray, stringified]
     }
@@ -23,11 +26,11 @@ function getEnvForDeployment(
 
 export async function run() {
   const gitHash = github.context.sha
-  const getAllEnv = getEnvForDeployment(process.env)
+  const envVars = getEnvForDeployment(process.env)
 
-  core.info(`env: ${getAllEnv}`)
+  core.info(`env: ${envVars}`)
   try {
-    const deployImage = await caproverDeploy({ gitHash })
+    const deployImage = await caproverDeploy({ gitHash, envVars })
 
     core.info(`${deployImage}`)
   } catch (error) {

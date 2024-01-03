@@ -22432,19 +22432,24 @@ async function getPostEnableAndReturnAppToken({
     }
   }
 }
-async function getPostEnableInstance({ appName }) {
+async function getPostEnableInstance({
+  appName,
+  envVars
+}) {
   return appName && caproverFetch({
     method: "POST",
     endpoint: "/user/apps/appDefinitions/update",
     body: {
       appName,
-      instanceCount: 1
+      instanceCount: 1,
+      ...Array.isArray(envVars) && envVars.length > 0 ? { envVars } : {}
     }
   });
 }
 async function caproverDeploy({
   isDetached = true,
-  gitHash = ""
+  gitHash = "",
+  envVars
 }) {
   const appName = getInputAppName;
   const imageName = getInputImageUrl;
@@ -22452,7 +22457,7 @@ async function caproverDeploy({
     core2.setFailed(`Caprover: no '${INPUT_IMAGE_URL}' provided.`);
   }
   try {
-    const enableInstance = await getPostEnableInstance({ appName });
+    const enableInstance = await getPostEnableInstance({ appName, envVars });
     if (enableInstance === STATUS.OKAY) {
       const startDeploy = await caproverFetch({
         method: "POST",

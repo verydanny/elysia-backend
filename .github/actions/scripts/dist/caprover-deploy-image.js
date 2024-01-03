@@ -22462,19 +22462,24 @@ async function getPostEnableAndReturnAppToken({
     }
   }
 }
-async function getPostEnableInstance({ appName }) {
+async function getPostEnableInstance({
+  appName,
+  envVars
+}) {
   return appName && caproverFetch({
     method: "POST",
     endpoint: "/user/apps/appDefinitions/update",
     body: {
       appName,
-      instanceCount: 1
+      instanceCount: 1,
+      ...Array.isArray(envVars) && envVars.length > 0 ? { envVars } : {}
     }
   });
 }
 async function caproverDeploy({
   isDetached = true,
-  gitHash = ""
+  gitHash = "",
+  envVars
 }) {
   const appName = getInputAppName;
   const imageName = getInputImageUrl;
@@ -22482,7 +22487,7 @@ async function caproverDeploy({
     core3.setFailed(`Caprover: no '${INPUT_IMAGE_URL}' provided.`);
   }
   try {
-    const enableInstance = await getPostEnableInstance({ appName });
+    const enableInstance = await getPostEnableInstance({ appName, envVars });
     if (enableInstance === STATUS.OKAY) {
       const startDeploy = await caproverFetch({
         method: "POST",
@@ -22552,7 +22557,10 @@ var getEnvForDeployment = function(env) {
     const matchEnv = currentEnv.match(CAP_ENV_REGEX);
     const matchResult = Array.isArray(matchEnv) && matchEnv[1];
     if (matchResult) {
-      const stringified = JSON.stringify({ [matchResult]: env[currentEnv] });
+      const stringified = JSON.stringify({
+        key: [matchResult],
+        value: env[currentEnv]
+      });
       return [...envArray, stringified];
     }
     return envArray;
@@ -22560,10 +22568,10 @@ var getEnvForDeployment = function(env) {
 };
 async function run() {
   const gitHash = github2.context.sha;
-  const getAllEnv = getEnvForDeployment(process.env);
-  core4.info(`env: ${getAllEnv}`);
+  const envVars = getEnvForDeployment(process.env);
+  core4.info(`env: ${envVars}`);
   try {
-    const deployImage = await caproverDeploy({ gitHash });
+    const deployImage = await caproverDeploy({ gitHash, envVars });
     core4.info(`${deployImage}`);
   } catch (error3) {
     if (error3) {

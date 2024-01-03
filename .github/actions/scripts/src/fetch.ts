@@ -38,6 +38,7 @@ interface CaproverBodyJSON {
   gitHash?: string
   instanceCount?: number
   forceSsl?: boolean
+  envVars?: string[]
 }
 
 interface CaproverFetch {
@@ -241,7 +242,13 @@ export async function getPostEnableAndReturnAppToken({
   }
 }
 
-export async function getPostEnableInstance({ appName }: { appName?: string }) {
+export async function getPostEnableInstance({
+  appName,
+  envVars,
+}: {
+  appName?: string
+  envVars?: string[]
+}) {
   return (
     appName &&
     caproverFetch({
@@ -250,6 +257,7 @@ export async function getPostEnableInstance({ appName }: { appName?: string }) {
       body: {
         appName,
         instanceCount: 1,
+        ...(Array.isArray(envVars) && envVars.length > 0 ? { envVars } : {}),
       },
     })
   )
@@ -271,9 +279,11 @@ export async function getPostEnableSsl({ appName }: { appName?: string }) {
 export async function caproverDeploy({
   isDetached = true,
   gitHash = '',
+  envVars,
 }: {
   isDetached?: boolean
   gitHash?: string
+  envVars?: string[]
 }) {
   const appName = getInputAppName
   const imageName = getInputImageUrl
@@ -283,7 +293,7 @@ export async function caproverDeploy({
   }
 
   try {
-    const enableInstance = await getPostEnableInstance({ appName })
+    const enableInstance = await getPostEnableInstance({ appName, envVars })
 
     if (enableInstance === STATUS.OKAY) {
       const startDeploy = await caproverFetch({
