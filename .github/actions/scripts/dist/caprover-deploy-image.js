@@ -22361,6 +22361,7 @@ async function getPostCaproverLogin() {
         ...otpToken && !isNaN(otpToken) ? { otpToken } : {}
       }
     });
+    core3.info(`Login result ${loginResult}`);
     if (loginResult && typeof loginResult === "object") {
       return loginResult.token;
     }
@@ -22427,7 +22428,6 @@ async function getPostEnableAndReturnAppToken({
     const prefetchAllApps = await getAllApps();
     if (typeof prefetchAllApps === "object") {
       const appToken = prefetchAllApps?.appDefinitions.find((apps) => apps.appName === appName);
-      core3.info(`${appToken}`);
       if (appToken?.appDeployTokenConfig?.enabled) {
         core3.info(`Caprover: '${appName}' token already enabled.`);
         return appToken?.appDeployTokenConfig?.appDeployToken;
