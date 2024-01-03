@@ -50,7 +50,7 @@ export async function run() {
         core.info(`Caprover: '${OUTPUT_APP_TOKEN}' set.`)
         core.setSecret(appToken)
 
-        core.setOutput(OUTPUT_APP_TOKEN, appToken)
+        return core.setOutput(OUTPUT_APP_TOKEN, appToken)
       }
     }
 

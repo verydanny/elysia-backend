@@ -22549,7 +22549,7 @@ async function run() {
       if (appToken) {
         core3.info(`Caprover: '${OUTPUT_APP_TOKEN}' set.`);
         core3.setSecret(appToken);
-        core3.setOutput(OUTPUT_APP_TOKEN, appToken);
+        return core3.setOutput(OUTPUT_APP_TOKEN, appToken);
       }
     }
   } catch (error3) {
