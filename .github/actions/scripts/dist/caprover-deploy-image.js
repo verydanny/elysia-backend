@@ -22557,10 +22557,10 @@ var getEnvForDeployment = function(env) {
     const matchEnv = currentEnv.match(CAP_ENV_REGEX);
     const matchResult = Array.isArray(matchEnv) && matchEnv[1];
     if (matchResult) {
-      const stringified = JSON.stringify({
+      const stringified = {
         key: matchResult,
-        value: env[currentEnv]
-      });
+        value: env[currentEnv] || ""
+      };
       return [...envArray, stringified];
     }
     return envArray;

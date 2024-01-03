@@ -4,18 +4,23 @@ import { getDeleteDeployments } from './githubHelpers.js'
 import { caproverDeploy } from './fetch.js'
 import { CAP_ENV_REGEX } from './constants.js'
 
+export interface EnvVar {
+  key: string
+  value: string
+}
+
 function getEnvForDeployment(
   env: Record<string, string | undefined>
-): string[] {
-  return Object.keys(env).reduce((envArray: string[], currentEnv) => {
+): EnvVar[] {
+  return Object.keys(env).reduce((envArray: EnvVar[], currentEnv) => {
     const matchEnv = currentEnv.match(CAP_ENV_REGEX)
     const matchResult = Array.isArray(matchEnv) && matchEnv[1]
 
     if (matchResult) {
-      const stringified = JSON.stringify({
+      const stringified = {
         key: matchResult,
-        value: env[currentEnv],
-      })
+        value: env[currentEnv] || '',
+      }
 
       return [...envArray, stringified]
     }

@@ -21,6 +21,7 @@ import {
 } from './constants.js'
 import { GetPostCaproverLogin, type GetAllAppsJson } from './fetchTypes.js'
 import { isEmpty } from 'rambda'
+import { EnvVar } from './caprover-deploy-image.js'
 
 interface CaptainError extends Error {
   captainError: Exclude<STATUS, STATUS.OKAY | STATUS.OKAY_BUILD_STARTED>
@@ -38,7 +39,7 @@ interface CaproverBodyJSON {
   gitHash?: string
   instanceCount?: number
   forceSsl?: boolean
-  envVars?: string[]
+  envVars?: EnvVar[]
 }
 
 interface CaproverFetch {
@@ -247,7 +248,7 @@ export async function getPostEnableInstance({
   envVars,
 }: {
   appName?: string
-  envVars?: string[]
+  envVars?: EnvVar[]
 }) {
   return (
     appName &&
@@ -283,7 +284,7 @@ export async function caproverDeploy({
 }: {
   isDetached?: boolean
   gitHash?: string
-  envVars?: string[]
+  envVars?: EnvVar[]
 }) {
   const appName = getInputAppName
   const imageName = getInputImageUrl
