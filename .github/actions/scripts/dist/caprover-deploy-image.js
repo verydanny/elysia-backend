@@ -22512,7 +22512,7 @@ async function caproverFetch(config) {
     core3.setFailed(`Caprover: '${INPUT_URL}' needed.`);
     return;
   }
-  if (!getInputPassword && config.endpoint === "/login" || !getInputAuthToken && config.endpoint !== "/login") {
+  if (!getInputPassword && config.endpoint === "/login" || !getInputAuthToken && config.endpoint !== "/login" || !getInputAppToken && config.endpoint !== "/login") {
     core3.setFailed(`Caprover: you must provide a '${INPUT_AUTH_TOKEN}' or '${INPUT_PASSWORD}'`);
     return;
   }

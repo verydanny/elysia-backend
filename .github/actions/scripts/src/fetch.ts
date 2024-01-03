@@ -327,7 +327,8 @@ export async function caproverFetch(config: CaproverFetch) {
 
   if (
     (!getInputPassword && config.endpoint === '/login') ||
-    (!getInputAuthToken && config.endpoint !== '/login')
+    (!getInputAuthToken && config.endpoint !== '/login') ||
+    (!getInputAppToken && config.endpoint !== '/login')
   ) {
     core.setFailed(
       `Caprover: you must provide a '${INPUT_AUTH_TOKEN}' or '${INPUT_PASSWORD}'`
