@@ -1,7 +1,5 @@
 import { Elysia } from 'elysia'
 import { cors } from '@elysiajs/cors'
-// import { cors } from '@elysiajs/cors'
-// import { html } from '@elysiajs/html'
 import { user } from './controller/user'
 
 const app = new Elysia({ prefix: '/api' })
