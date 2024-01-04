@@ -15,18 +15,12 @@ export const supabasePlugin = new Elysia().derive(({ cookie }) => {
       {
         cookies: {
           get: (key) => {
-            console.log(`Cookie Get('${key}')`, cookie[key].get())
-
-            return cookie[key].get()
+            return decodeURIComponent(cookie[key].toString())
           },
           set: (key, value, options) => {
-            console.log(`Cookie Set('${key}'): '${value}'`, cookie[key])
-
             cookie[key].set(options).value = value
           },
           remove: (key, options) => {
-            console.log(`Cookie Remove('${key}')`, cookie[key])
-
             return cookie[key].remove(options)
           },
         },

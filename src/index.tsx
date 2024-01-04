@@ -5,6 +5,7 @@ import { user } from './controller/user.js'
 
 const app = new Elysia({ prefix: '/api' })
   .use(user)
+  .get('/', () => 'Home Page')
   .listen(Bun.env.PORT || 3000)
 
 export type App = typeof app

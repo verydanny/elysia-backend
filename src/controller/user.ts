@@ -2,13 +2,13 @@ import { Elysia } from 'elysia'
 import { supabasePlugin } from '../supabase.js'
 import { authModel } from '../model/signup.model.js'
 
-function signup(app: typeof supabasePlugin) {
+function signup(app: User) {
   return app.post(
     '/signup',
     async ({ body, supabase }) => {
       const { username, password } = body
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: username,
         password,
         options: {
@@ -17,35 +17,35 @@ function signup(app: typeof supabasePlugin) {
       })
 
       if (!error) {
-        return `Sign-Up Successful`
+        return data.user
       }
     },
-    { body: authModel }
+    { body: 'sign' }
   )
 }
 
-function signin(app: typeof supabasePlugin) {
+function signin(app: User) {
   return app.post(
     '/signin',
     async ({ body, supabase }) => {
       const { username, password } = body
 
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: username,
         password,
       })
 
       if (!error) {
-        return 'Login Successful'
+        return data.user
       }
     },
     {
-      body: authModel,
+      body: 'sign',
     }
   )
 }
 
-function signout(app: typeof supabasePlugin) {
+function signout(app: User) {
   return app.post('/signout', async ({ supabase }) => {
     const { error } = await supabase.auth.signOut({ scope: 'global' })
 
@@ -55,8 +55,49 @@ function signout(app: typeof supabasePlugin) {
   })
 }
 
-export const user = new Elysia({ prefix: '/user' })
+function refresh(app: User) {
+  return app.get('/refresh', async ({ supabase }) => {
+    const { data, error } = await supabase.auth.refreshSession()
+
+    if (!error) {
+      return data.user
+    }
+  })
+}
+
+/**
+ * Path: path <ORIGIN>/api/user/confirm
+ */
+function confirm(app: User) {
+  return app.get(
+    '/confirm',
+    async ({ supabase, query, set }) => {
+      const { token_hash, type } = query
+
+      const { error } = await supabase.auth.verifyOtp({
+        type,
+        token_hash,
+      })
+
+      if (!error) {
+        set.status = 200
+      }
+    },
+    {
+      query: 'confirm',
+    }
+  )
+}
+
+export const userRoute = new Elysia({ prefix: '/user' })
+  .use(authModel)
   .use(supabasePlugin)
+
+export const user = userRoute
   .use(signup)
   .use(signin)
   .use(signout)
+  .use(refresh)
+  .use(confirm)
+
+export type User = typeof userRoute
