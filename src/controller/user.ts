@@ -1,6 +1,6 @@
 import { Elysia } from 'elysia'
-import { supabasePlugin } from '../supabase.js'
-import { authModel } from '../model/signup.model.js'
+import { supabasePlugin } from '../supabase'
+import { authModel } from '../model/signup.model'
 
 function signup(app: User) {
   return app.post(
