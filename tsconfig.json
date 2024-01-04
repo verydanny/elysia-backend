@@ -4,7 +4,6 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
-    "jsx": "react-jsx",
     "allowJs": false,
 
     /* Bundler mode */
@@ -19,13 +18,15 @@
     "skipLibCheck": true,
     "strict": true,
     "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true,
-    "incremental": true
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
     "lucia.ts",
     "Lucia.d.ts"
+  ],
+  "exclude": [
+    "node_modules/**"
   ]
 }
