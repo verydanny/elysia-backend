@@ -12,8 +12,7 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./types/src/index.d.ts",
-        "default": "./types/src/index.d.ts"
+        "types": "./types/src/index.d.ts"
       }
     }
   },
@@ -21,11 +20,9 @@
     "@elysiajs/cors": "0.8.0",
     "@elysiajs/eden": "0.8.0",
     "@elysiajs/html": "0.8.0",
-    "@lucia-auth/adapter-postgresql": "2.0.2",
     "@supabase/ssr": "0.0.10",
     "@supabase/supabase-js": "2.39.2",
     "elysia": "0.8.8",
-    "lucia": "2.7.6",
     "postgres": "3.4.3"
   },
   "devDependencies": {

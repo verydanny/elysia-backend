@@ -1,6 +1,6 @@
 import { Elysia } from 'elysia'
 import { cors } from '@elysiajs/cors'
-import { user } from './controller/user'
+import { user } from './controller/user/user'
 
 const app = new Elysia({ prefix: '/api' })
   .use(
