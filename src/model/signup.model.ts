@@ -1,16 +1,21 @@
 import { Elysia, t } from 'elysia'
 
+const email = t.String({
+  format: 'email',
+  default: undefined,
+  examples: ['user@email.com', 'user@gmail.com'],
+})
+
 export const authModel = new Elysia().model({
   sign: t.Object({
-    username: t.String({
-      format: 'email',
-      default: undefined,
-      examples: ['user@email.com', 'user@gmail.com'],
-    }),
+    username: email,
     password: t.String({
       minLength: 6,
       maxLength: 72,
     }),
+  }),
+  magiclink: t.Object({
+    email,
   }),
   confirm: t.Object({
     type: t.Union([
@@ -21,6 +26,8 @@ export const authModel = new Elysia().model({
       t.Literal('email_change'),
       t.Literal('email'),
     ]),
-    token_hash: t.String(),
+    token_hash: t.Optional(t.String()),
+    token: t.Optional(t.String()),
+    email: t.Optional(t.String({ format: 'email' })),
   }),
 })

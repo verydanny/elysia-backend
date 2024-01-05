@@ -1,0 +1,9 @@
+<html>
+
+<body>
+  <h2>Click to login, my favorite human:</h2>
+  <a href="{{ .SiteURL }}/api/user/confirm?email={{ .Email }}&token_hash={{ .TokenHash }}&type=email">Click here to Confirm</a>
+  <p>Alternatively, use this OTP: <strong>{{ .Token }}</strong> (if all else fails)</p>
+</body>
+
+</html>

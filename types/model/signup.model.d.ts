@@ -10,9 +10,14 @@ export declare const authModel: Elysia<"", {
             username: string;
             password: string;
         };
+        magiclink: {
+            email: string;
+        };
         confirm: {
-            type: "email" | "signup" | "invite" | "magiclink" | "recovery" | "email_change";
-            token_hash: string;
+            email?: string | undefined;
+            token_hash?: string | undefined;
+            token?: string | undefined;
+            type: "email" | "magiclink" | "signup" | "invite" | "recovery" | "email_change";
         };
     };
     error: {};

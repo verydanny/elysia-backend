@@ -1,5 +1,5 @@
 import { type User } from './user';
-export declare function signout(app: User): import("elysia").default<"/user", {
+export declare function magiclink(app: User): Promise<import("elysia").default<"/user", {
     request: {};
     store: {};
     derive: {
@@ -31,26 +31,20 @@ export declare function signout(app: User): import("elysia").default<"/user", {
     cookie: unknown;
     response: unknown;
 }, {}, {
-    "/user/signout": {
-        get: {
-            body: unknown;
-            params: never;
-            query: unknown;
-            headers: unknown;
-            response: {
-                200: Promise<"Logout Successful" | undefined>;
-            };
-        };
-    } & {
+    "/user/magiclink": {
         post: {
-            body: unknown;
+            body: {
+                email: string;
+            };
             params: never;
             query: unknown;
             headers: unknown;
             response: {
-                200: Promise<"Logout Successful" | undefined>;
+                200: Promise<import("@supabase/gotrue-js").AuthError | {
+                    status: string;
+                }>;
             };
         };
     };
-}, false>;
-//# sourceMappingURL=signout.d.ts.map
+}, false>>;
+//# sourceMappingURL=magiclink.d.ts.map

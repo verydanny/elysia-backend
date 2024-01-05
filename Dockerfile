@@ -1,4 +1,4 @@
-FROM oven/bun:slim as base
+FROM oven/bun:alpine as base
 WORKDIR /usr/src/app
 
 # install dependencies into temp directory

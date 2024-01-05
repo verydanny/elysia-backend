@@ -9,9 +9,6 @@ export function signup(app: User) {
       const { data, error } = await supabase.auth.signUp({
         email: username,
         password,
-        options: {
-          emailRedirectTo: `${Bun.env.ORIGIN}/api/user/confirm`,
-        },
       })
 
       if (!error) {

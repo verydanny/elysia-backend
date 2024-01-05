@@ -15,9 +15,14 @@ export declare function confirm(app: User): import("elysia").default<"/user", {
             username: string;
             password: string;
         };
+        magiclink: {
+            email: string;
+        };
         confirm: {
-            type: "email" | "signup" | "invite" | "magiclink" | "recovery" | "email_change";
-            token_hash: string;
+            email?: string | undefined;
+            token_hash?: string | undefined;
+            token?: string | undefined;
+            type: "email" | "magiclink" | "signup" | "invite" | "recovery" | "email_change";
         };
     };
     error: {};
@@ -34,12 +39,16 @@ export declare function confirm(app: User): import("elysia").default<"/user", {
             body: unknown;
             params: never;
             query: {
-                type: "email" | "signup" | "invite" | "magiclink" | "recovery" | "email_change";
-                token_hash: string;
+                email?: string | undefined;
+                token_hash?: string | undefined;
+                token?: string | undefined;
+                type: "email" | "magiclink" | "signup" | "invite" | "recovery" | "email_change";
             };
             headers: unknown;
             response: {
-                200: Promise<void>;
+                200: Promise<import("@supabase/gotrue-js").AuthError | {
+                    status: string;
+                } | undefined>;
             };
         };
     };

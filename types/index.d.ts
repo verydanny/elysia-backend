@@ -12,9 +12,14 @@ declare const app: Elysia<"/api", {
             username: string;
             password: string;
         };
+        magiclink: {
+            email: string;
+        };
         confirm: {
-            type: "email" | "signup" | "invite" | "magiclink" | "recovery" | "email_change";
-            token_hash: string;
+            email?: string | undefined;
+            token_hash?: string | undefined;
+            token?: string | undefined;
+            type: "email" | "magiclink" | "signup" | "invite" | "recovery" | "email_change";
         };
     };
     error: {};
@@ -25,8 +30,23 @@ declare const app: Elysia<"/api", {
     params: unknown;
     cookie: unknown;
     response: unknown;
-}, {}, import("elysia/types").AddPrefix<"/api", {}> & import("elysia/types").AddPrefix<"/api", import("elysia/types").AddPrefix<"/user", {}> & {
-    "/user/signup": {
+}, {}, {
+    "/api/user/magiclink": {
+        post: {
+            body: {
+                email: string;
+            };
+            params: never;
+            query: unknown;
+            headers: unknown;
+            response: {
+                200: Promise<import("@supabase/gotrue-js").AuthError | {
+                    status: string;
+                }>;
+            };
+        };
+    };
+    "/api/user/signup": {
         post: {
             body: {
                 username: string;
@@ -40,8 +60,7 @@ declare const app: Elysia<"/api", {
             };
         };
     };
-} & {
-    "/user/signin": {
+    "/api/user/signin": {
         post: {
             body: {
                 username: string;
@@ -51,12 +70,31 @@ declare const app: Elysia<"/api", {
             query: unknown;
             headers: unknown;
             response: {
-                200: Promise<import("@supabase/gotrue-js").User | undefined>;
+                200: Promise<{
+                    error: null;
+                    data: {
+                        user: import("@supabase/gotrue-js").User;
+                        session: import("@supabase/gotrue-js").Session;
+                        weakPassword?: import("@supabase/gotrue-js").WeakPassword | undefined;
+                    };
+                } | {
+                    error: import("@supabase/gotrue-js").AuthError;
+                    data?: undefined;
+                }>;
             };
         };
     };
-} & {
-    "/user/signout": {
+    "/api/user/signout": {
+        get: {
+            body: unknown;
+            params: never;
+            query: unknown;
+            headers: unknown;
+            response: {
+                200: Promise<"Logout Successful" | undefined>;
+            };
+        };
+    } & {
         post: {
             body: unknown;
             params: never;
@@ -67,8 +105,7 @@ declare const app: Elysia<"/api", {
             };
         };
     };
-} & {
-    "/user/refresh": {
+    "/api/user/refresh": {
         get: {
             body: unknown;
             params: never;
@@ -79,22 +116,36 @@ declare const app: Elysia<"/api", {
             };
         };
     };
-} & {
-    "/user/confirm": {
+    "/api/user/confirm": {
         get: {
             body: unknown;
             params: never;
             query: {
-                type: "email" | "signup" | "invite" | "magiclink" | "recovery" | "email_change";
-                token_hash: string;
+                email?: string | undefined;
+                token_hash?: string | undefined;
+                token?: string | undefined;
+                type: "email" | "magiclink" | "signup" | "invite" | "recovery" | "email_change";
             };
             headers: unknown;
             response: {
-                200: Promise<void>;
+                200: Promise<import("@supabase/gotrue-js").AuthError | {
+                    status: string;
+                } | undefined>;
             };
         };
     };
-}>, false>;
+    "/api/": {
+        get: {
+            body: unknown;
+            params: never;
+            query: unknown;
+            headers: unknown;
+            response: {
+                200: string;
+            };
+        };
+    };
+}, false>;
 export type App = typeof app;
 export {};
 //# sourceMappingURL=index.d.ts.map

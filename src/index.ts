@@ -6,10 +6,11 @@ const app = new Elysia({ prefix: '/api' })
   .use(
     cors({
       origin: [/localhost:\d+/],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: ['Content-Type'],
     })
   )
   .use(user)
+  .get('/', () => 'Home Page')
 
 export type App = typeof app
 

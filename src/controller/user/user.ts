@@ -7,12 +7,14 @@ import { signin } from './signin'
 import { signout } from './signout'
 import { confirm } from './confirm'
 import { refresh } from './refresh'
+import { magiclink } from './magiclink'
 
 export const userRoute = new Elysia({ prefix: '/user' })
-  .use(authModel)
   .use(supabasePlugin)
+  .use(authModel)
 
 export const user = userRoute
+  .use(magiclink)
   .use(signup)
   .use(signin)
   .use(signout)

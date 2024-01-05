@@ -3,7 +3,7 @@ import { type User } from './user'
 export function signin(app: User) {
   return app.post(
     '/signin',
-    async ({ body, supabase }) => {
+    async ({ body, supabase, set }) => {
       const { username, password } = body
 
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -12,11 +12,21 @@ export function signin(app: User) {
       })
 
       if (!error) {
-        return data.user
+        return {
+          error,
+          data,
+        }
+      }
+
+      set.status = 'Bad Request'
+
+      return {
+        error,
       }
     },
     {
       body: 'sign',
+      type: 'application/json',
     }
   )
 }
