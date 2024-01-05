@@ -25,8 +25,8 @@ declare const app: Elysia<"/api", {
     params: unknown;
     cookie: unknown;
     response: unknown;
-}, {}, {
-    "/api/user/signup": {
+}, {}, import("elysia/types").AddPrefix<"/api", {}> & import("elysia/types").AddPrefix<"/api", import("elysia/types").AddPrefix<"/user", {}> & {
+    "/user/signup": {
         post: {
             body: {
                 username: string;
@@ -40,7 +40,8 @@ declare const app: Elysia<"/api", {
             };
         };
     };
-    "/api/user/signin": {
+} & {
+    "/user/signin": {
         post: {
             body: {
                 username: string;
@@ -54,7 +55,8 @@ declare const app: Elysia<"/api", {
             };
         };
     };
-    "/api/user/signout": {
+} & {
+    "/user/signout": {
         post: {
             body: unknown;
             params: never;
@@ -65,7 +67,8 @@ declare const app: Elysia<"/api", {
             };
         };
     };
-    "/api/user/refresh": {
+} & {
+    "/user/refresh": {
         get: {
             body: unknown;
             params: never;
@@ -76,7 +79,8 @@ declare const app: Elysia<"/api", {
             };
         };
     };
-    "/api/user/confirm": {
+} & {
+    "/user/confirm": {
         get: {
             body: unknown;
             params: never;
@@ -90,18 +94,7 @@ declare const app: Elysia<"/api", {
             };
         };
     };
-    "/api/": {
-        get: {
-            body: unknown;
-            params: never;
-            query: unknown;
-            headers: unknown;
-            response: {
-                200: string;
-            };
-        };
-    };
-}, false>;
+}>, false>;
 export type App = typeof app;
 export {};
 //# sourceMappingURL=index.d.ts.map

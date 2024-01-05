@@ -13,6 +13,7 @@
     "declarationMap": true,
     "emitDeclarationOnly": true,
     "declarationDir": "types",
+    "isolatedModules": true,
 
     /* Linting */
     "skipLibCheck": true,
@@ -27,6 +28,7 @@
     "Lucia.d.ts"
   ],
   "exclude": [
-    "node_modules/**"
+    "**/node_modules",
+    "**/.*/"
   ]
 }

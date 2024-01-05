@@ -15,6 +15,9 @@ const compat = new FlatCompat({
 
 /** @type { Array<import("eslint").Linter.FlatConfig> } */
 export default [
+  {
+    ignores: ['**/node_modules', '**/.github/actions/scripts/dist'],
+  },
   js.configs.recommended,
   ...compat.extends('plugin:@typescript-eslint/recommended'),
   {
@@ -26,8 +29,5 @@ export default [
       },
     },
   },
-  eslintConfigPrettier,
-  {
-    ignores: ['**/node_modules', '**/.github/actions/scripts/dist'],
-  },
+  eslintConfigPrettier
 ]
